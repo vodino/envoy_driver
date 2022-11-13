@@ -1,0 +1,79 @@
+name: envoy_driver
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.4 <3.0.0'
+
+dependencies:
+  
+  cupertino_icons:
+  flutter:
+    sdk: flutter
+
+  # Assets
+  flutter_localizations:
+    sdk: flutter
+  equatable:
+  go_router:
+  intl:
+
+  # Widgets
+  modal_bottom_sheet:
+  flutter_rating_bar:
+  loading_indicator:
+  slide_countdown:
+  auto_size_text:
+  flutter_svg:
+  shimmer:
+  badges:
+  lottie:
+  pinput:
+
+  # Location and Geocoding
+  location:
+  maplibre_gl:
+      git:
+        url: https://github.com/m0nac0/flutter-maplibre-gl.git
+        ref: main
+  
+  # Service
+  firebase_auth:
+  firebase_core:
+  dio:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_gen_runner:
+  flutter_lints:
+  build_runner:
+
+flutter_gen:
+  output: lib/screen/widget/custom/
+
+  integrations:
+    flutter_svg: true
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/files/
+    - assets/images/
+
+  fonts:
+    - family: SF-Pro-Rounded
+      fonts:
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Black.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Bold.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Heavy.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Light.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Medium.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Regular.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-SemiBold.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-Thin.otf
+        - asset: assets/fonts/SF-Pro-Rounded/SF-Pro-Rounded-UltraLight.otf
