@@ -61,19 +61,15 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
                   children: [
                     Expanded(
                       child: CustomOutlineButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: () => Navigator.pop(context),
                         child: const Text('Refuser'),
                       ),
                     ),
                     const SizedBox(width: 8.0),
                     Expanded(
                       child: CupertinoButton.filled(
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
                         padding: const EdgeInsets.symmetric(vertical: 14.0),
+                        onPressed: () => Navigator.pop(context, true),
                         child: const Text('Accepter'),
                       ),
                     ),

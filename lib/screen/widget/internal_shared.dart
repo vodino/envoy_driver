@@ -103,11 +103,15 @@ class CustomBoxShadow extends StatelessWidget {
   const CustomBoxShadow({
     super.key,
     required this.child,
+    this.shadow = true,
+    this.border = true,
     this.color,
   });
 
   final Widget child;
   final Color? color;
+  final bool shadow;
+  final bool border;
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +120,8 @@ class CustomBoxShadow extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.symmetric(horizontal: 12.0),
       decoration: BoxDecoration(
-        boxShadow: const [BoxShadow(spreadRadius: -14.0, blurRadius: 16.0)],
-        border: Border.all(color: CupertinoColors.systemFill),
+        boxShadow: shadow ? const [BoxShadow(spreadRadius: -14.0, blurRadius: 16.0)] : null,
+        border: border ? Border.all(color: CupertinoColors.systemFill) : null,
         borderRadius: BorderRadius.circular(12.0),
         color: color ?? theme.colorScheme.surface,
       ),
@@ -161,6 +165,105 @@ class CustomLoading extends StatelessWidget {
     return const LoadingIndicator(
       colors: [CupertinoColors.systemGrey],
       indicatorType: Indicator.ballClipRotateMultiple,
+    );
+  }
+}
+
+class CustomAudioPlayer extends StatelessWidget {
+  const CustomAudioPlayer({
+    super.key,
+    this.onChanged,
+    this.isPlaying = false,
+    this.position = Duration.zero,
+    this.duration = const Duration(seconds: 30),
+  });
+
+  final bool isPlaying;
+  final Duration position;
+  final Duration duration;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: CustomButton(
+        onPressed: () => onChanged?.call(!isPlaying),
+        child: Material(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+            side: const BorderSide(),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+            child: Row(
+              children: [
+                Visibility(
+                  visible: isPlaying,
+                  replacement: const Icon(CupertinoIcons.play_fill),
+                  child: const Icon(CupertinoIcons.pause_fill),
+                ),
+                const SizedBox(width: 12.0),
+                Text((position.toString().split('.')[0]).substring(2)),
+                const SizedBox(width: 8.0),
+                Expanded(
+                  child: LinearProgressIndicator(
+                    backgroundColor: CupertinoColors.systemFill,
+                    value: (position.inSeconds / duration.inSeconds).clamp(0.0, 1.0),
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Text((duration.toString().split('.')[0]).substring(2)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomSheetButton extends StatelessWidget {
+  const CustomSheetButton({
+    super.key,
+    required this.child,
+    required this.onPressed,
+  });
+
+  final Widget child;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: CupertinoButton.filled(
+        onPressed: onPressed,
+        child: child,
+      ),
+    );
+  }
+}
+
+class CustomLocationTile extends StatelessWidget {
+  const CustomLocationTile({
+    super.key,
+    required this.title,
+  });
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomListTile(
+      leading: const Icon(
+        CupertinoIcons.location_solid,
+        color: CupertinoColors.systemGrey2,
+      ),
+      title: Text(
+        title,
+        style: context.cupertinoTheme.textTheme.textStyle,
+      ),
     );
   }
 }
