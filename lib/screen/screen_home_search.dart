@@ -16,12 +16,26 @@ class HomeOfflineScreen extends StatefulWidget {
 }
 
 class _HomeOfflineScreenState extends State<HomeOfflineScreen> {
+  /// Customer
   late final ValueNotifier<bool> _userStatus;
+
+  /// PusherService
+  late final PusherService _pusherService;
+
+  void _subscribe() {
+    _pusherService.handle(const SubscribeToEvent());
+  }
 
   @override
   void initState() {
     super.initState();
+
+    /// Customer
     _userStatus = ValueNotifier(false);
+
+    /// PusherService
+    _pusherService = PusherService.instance();
+    _subscribe();
   }
 
   @override

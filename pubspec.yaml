@@ -43,6 +43,11 @@ dependencies:
   # Service
   firebase_auth:
   firebase_core:
+  pusher_client:
+    git:
+      url: https://github.com/thijskuilman/pusher_client.git
+  hive_flutter:
+  hive:
   dio:
 
 dev_dependencies:

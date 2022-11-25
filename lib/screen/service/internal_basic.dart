@@ -9,7 +9,9 @@ Future<void> runService() async {
   } else {
     service = const ProductionService();
   }
-  return service._initialize();
+  await service._initialize();
+
+  await ClientService.instance().handle(const GetClient());
 }
 
 abstract class Service {
@@ -20,11 +22,11 @@ abstract class Service {
 
 class DevelopmentService extends Service {
   const DevelopmentService();
-
   @override
   Future<void> _initialize() async {
     RepositoryService.development();
     await FirebaseService.development();
+    await HiveService.developement();
   }
 }
 
@@ -35,5 +37,6 @@ class ProductionService extends Service {
   Future<void> _initialize() async {
     RepositoryService.production();
     await FirebaseService.production();
+    await HiveService.production();
   }
 }

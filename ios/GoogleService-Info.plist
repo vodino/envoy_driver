@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>994564375959-chf8tb0hib65km9ap8g38qhcfganqqrl.apps.googleusercontent.com</string>
+	<string>994564375959-6qa4jl43km8i24ro8c79dcbfhde3hdh2.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.994564375959-chf8tb0hib65km9ap8g38qhcfganqqrl</string>
+	<string>com.googleusercontent.apps.994564375959-6qa4jl43km8i24ro8c79dcbfhde3hdh2</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCOry45cqHVPmdacBPEtdgx9vIuVJfYKxs</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.envoy.Envoy</string>
+	<string>com.envoy.EnvoyDriver</string>
 	<key>PROJECT_ID</key>
 	<string>envoy-366817</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:994564375959:ios:7d5550914a0a18d8c570d2</string>
+	<string>1:994564375959:ios:f7766637162f4a01c570d2</string>
 </dict>
 </plist>

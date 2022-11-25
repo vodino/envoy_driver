@@ -2,6 +2,10 @@ export 'service/_service.dart';
 export 'widget/_widget.dart';
 
 export 'screen_account.dart';
+export 'screen_authentication_country.dart';
+export 'screen_authentication_signup.dart';
+export 'screen_authentication_verification.dart';
+export 'screen_authentication.dart';
 export 'screen_availablity.dart';
 export "screen_helpfaq.dart";
 export 'screen_home_drawer.dart';

@@ -29,6 +29,7 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: HomeScreen.path,
           name: HomeScreen.name,
+          redirect: (context, state) => ClientService.authenticated ? null : AuthScreen.path,
           pageBuilder: (context, state) {
             return const NoTransitionPage(
               child: CustomKeepAlive(
@@ -66,6 +67,51 @@ class _MyAppState extends State<MyApp> {
                 return const CupertinoPage(
                   child: CustomKeepAlive(
                     child: HelpFaqScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: AuthScreen.path,
+          name: AuthScreen.name,
+          pageBuilder: (context, state) {
+            return const CupertinoPage(
+              child: CustomKeepAlive(
+                child: AuthScreen(),
+              ),
+            );
+          },
+          routes: [
+            GoRoute(
+              path: AuthVerificationScreen.path,
+              name: AuthVerificationScreen.name,
+              pageBuilder: (context, state) {
+                final data = (state.extra as Map<String, dynamic>);
+                return CupertinoPage(
+                  child: CustomKeepAlive(
+                    child: AuthVerificationScreen(
+                      verificationId: data[AuthVerificationScreen.verificationIdKey],
+                      phoneNumber: data[AuthVerificationScreen.phoneNumberKey],
+                      resendToken: data[AuthVerificationScreen.resendTokenKey],
+                      timeout: data[AuthVerificationScreen.timeoutKey],
+                    ),
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: AuthSignupScreen.path,
+              name: AuthSignupScreen.name,
+              pageBuilder: (context, state) {
+                final data = (state.extra as Map<String, dynamic>);
+                return CupertinoPage(
+                  child: CustomKeepAlive(
+                    child: AuthSignupScreen(
+                      phoneNumber: data[AuthSignupScreen.phoneNumberKey],
+                      token: data[AuthSignupScreen.tokenKey],
+                    ),
                   ),
                 );
               },
