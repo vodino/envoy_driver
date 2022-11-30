@@ -16,8 +16,10 @@ class ClientService extends ValueNotifier<ClientState> {
 
   Future<void> handle(ClientEvent event) => event._execute(this);
 
-  static bool get authenticated {
-    return ClientService.instance().value is ClientItemState;
+  static ClientSchema? get authenticated {
+    final state = ClientService.instance().value;
+    if (state is ClientItemState) return state.data;
+    return null;
   }
 }
 
@@ -128,9 +130,6 @@ class RegisterClient extends ClientEvent {
           );
       }
     } catch (error) {
-      if (error is DioError) {
-        print(error.response?.data);
-      }
       service.value = FailureClientState(
         message: error.toString(),
         event: this,

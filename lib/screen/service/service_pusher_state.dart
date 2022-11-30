@@ -20,3 +20,17 @@ class FailurePusherState extends PusherState {
   final CustomPusherEvent? event;
   final String message;
 }
+
+class SubscriptionPusherState extends PusherState {
+  const SubscriptionPusherState({
+    required this.canceller,
+  });
+
+  final Future<void> Function() canceller;
+}
+
+class NewOrderPusherState extends PusherState {
+  const NewOrderPusherState({required this.data});
+
+  final OrderSchema data;
+}

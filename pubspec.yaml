@@ -26,6 +26,7 @@ dependencies:
   flutter_rating_bar:
   loading_indicator:
   slide_countdown:
+  dart_pusher_channels:
   auto_size_text:
   flutter_svg:
   shimmer:
@@ -36,16 +37,17 @@ dependencies:
   # Location and Geocoding
   location:
   maplibre_gl:
-      git:
-        url: https://github.com/m0nac0/flutter-maplibre-gl.git
-        ref: main
+    git:
+      url: https://github.com/m0nac0/flutter-maplibre-gl.git
+      ref: main
   
   # Service
-  firebase_auth:
-  firebase_core:
   pusher_client:
     git:
       url: https://github.com/thijskuilman/pusher_client.git
+  firebase_messaging:
+  firebase_auth:
+  firebase_core:
   hive_flutter:
   hive:
   dio:

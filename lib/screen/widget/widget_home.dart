@@ -68,12 +68,11 @@ class HomeMap extends StatelessWidget {
       onCameraIdle: onCameraIdle,
       onMapCreated: onMapCreated,
       onMapLongClick: onMapLongClick,
-      cameraTargetBounds: CameraTargetBounds.unbounded,
       onUserLocationUpdated: onUserLocationUpdated,
       onStyleLoadedCallback: onStyleLoadedCallback ?? () {},
       gestureRecognizers: {Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer())},
       initialCameraPosition: initialCameraPosition ?? const CameraPosition(target: LatLng(0.0, 0.0)),
-      styleString: 'https://api.maptiler.com/maps/57a3fe25-6f58-47b5-863f-ffd1be0122eb/style.json?key=ohdDnBihXL3Yk2cDRMfO',
+      styleString: 'https://api.maptiler.com/maps/86f5df0b-f809-4e6f-b8f0-9d3e0976fe90/style.json?key=ohdDnBihXL3Yk2cDRMfO',
     );
   }
 }

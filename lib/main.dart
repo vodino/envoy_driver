@@ -29,7 +29,9 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: HomeScreen.path,
           name: HomeScreen.name,
-          redirect: (context, state) => ClientService.authenticated ? null : AuthScreen.path,
+          redirect: (context, state) {
+            return ClientService.authenticated != null ? null : AuthScreen.path;
+          },
           pageBuilder: (context, state) {
             return const NoTransitionPage(
               child: CustomKeepAlive(

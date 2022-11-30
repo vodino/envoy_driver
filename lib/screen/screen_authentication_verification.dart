@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '_screen.dart';
 
@@ -111,7 +110,6 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
 
   void _listenClientService(BuildContext context, ClientState state) {
     if (state is ClientItemState) {
-      print(state);
       context.goNamed(HomeScreen.name);
     } else if (state is NoClientItemState) {
       context.goNamed(
@@ -121,6 +119,8 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
           AuthSignupScreen.tokenKey: state.token,
         },
       );
+    } else if (state is FailureClientState) {
+      _errorController.value = state.message;
     }
   }
 

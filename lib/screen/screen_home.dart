@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
   /// MapLibre
   MaplibreMapController? _mapController;
   late final ValueNotifier<bool> _myPositionFocus;
-  UserLocation? _myPosition;
+  UserLocation? _userLocation;
 
   void _onMapCreated(MaplibreMapController controller) async {
     _mapController = controller;
@@ -120,11 +120,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _locationService.value = UserLocationItemState(data: location);
   }
 
-  void _goToMyPosition() async {
-    if (_myPosition != null && _mapController != null && _myPositionFocus.value) {
-      final position = _myPosition!.position;
+  void _goToMyPosition() {
+    if (_userLocation != null && _mapController != null && _myPositionFocus.value) {
+      final position = _userLocation!.position;
       _mapController!.animateCamera(
-        CameraUpdate.newCameraPosition(CameraPosition(target: position, zoom: 15.0)),
+        CameraUpdate.newCameraPosition(CameraPosition(
+          bearing: _userLocation!.bearing!,
+          target: position,
+          tilt: 60.0,
+          zoom: 18.0,
+        )),
         duration: const Duration(seconds: 1),
       );
     }
@@ -134,10 +139,14 @@ class _HomeScreenState extends State<HomeScreen> {
   late final LocationService _locationService;
   StreamSubscription? _locationSubscription;
 
+  void _getCurrentLocation() {
+    _locationService.handle(const GetLocation(subscription: true, distanceFilter: 5));
+  }
+
   void _listenLocationState(BuildContext context, LocationState state) {
     if (state is UserLocationItemState) {
       _locationSubscription = state.subscription;
-      _myPosition = state.data;
+      _userLocation = state.data;
       _goToMyPosition();
     }
   }
@@ -151,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     /// LocationService
     _locationService = LocationService.instance();
+    _getCurrentLocation();
   }
 
   @override

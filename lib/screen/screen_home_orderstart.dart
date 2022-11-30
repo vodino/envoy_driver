@@ -85,7 +85,7 @@ class HomeOrderStartScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: CupertinoButton.filled(
                 child: const Text('Commencer'),
                 onPressed: () {

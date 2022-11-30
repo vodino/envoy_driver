@@ -21,11 +21,12 @@ abstract class CustomPusherEvent {
   const CustomPusherEvent();
 
   PusherClient createClient() {
-    final state = ClientService.instance().value as ClientItemState;
-    final token = state.data.accessToken;
+    final authenticated = ClientService.authenticated!;
+    final token = authenticated.accessToken;
     return PusherClient(
       'ebfafd3c927ce67edeff',
       PusherOptions(
+        cluster: 'eu',
         auth: PusherAuth(
           '${RepositoryService.httpURL}/broadcasting/auth',
           headers: {
@@ -34,7 +35,6 @@ abstract class CustomPusherEvent {
             HttpHeaders.contentTypeHeader: 'application/json',
           },
         ),
-        cluster: 'eu',
       ),
     );
   }
@@ -42,17 +42,16 @@ abstract class CustomPusherEvent {
   Future<void> _execute(PusherService service);
 }
 
-class SubscribeToEvent extends CustomPusherEvent {
-  const SubscribeToEvent();
+class ListenNewOrderEvent extends CustomPusherEvent {
+  const ListenNewOrderEvent();
 
-  void onEvent(PusherEvent? event) {
-    print(event?.data);
-  }
+  static const _presenceDeliveryChannel = 'presence-delivery';
+  static const _privateDeliveryChannel = 'private-delivery';
+  static const _deliveryToSpecificUserEvent = 'delivery-to-specific-user';
 
   @override
   Future<void> _execute(PusherService service) async {
-    final state = ClientService.instance().value as ClientItemState;
-    final id = state.data.accessToken;
+    service.value = const PendingPusherState();
     try {
       final client = createClient();
       client.onConnectionError((error) {
@@ -61,8 +60,28 @@ class SubscribeToEvent extends CustomPusherEvent {
           event: this,
         );
       });
-      final channel = client.subscribe('private-delivery.1');
-      await channel.bind('delivery-created', onEvent);
+      final user = ClientService.authenticated!;
+      //  client.unsubscribe('$_presenceDeliveryChannel.1');
+      client.subscribe('$_presenceDeliveryChannel.1');
+
+      //  client.unsubscribe('$_privateDeliveryChannel.${user.id}');
+      final privateChannel = client.subscribe('$_privateDeliveryChannel.${user.id}');
+      privateChannel.bind(_deliveryToSpecificUserEvent, (event) async {
+        print(service.value);
+        final data = await compute(OrderSchema.fromJson, event!.data!);
+        service.value = NewOrderPusherState(data: data);
+        print(service.value);
+        print(data);
+      });
+
+      Future<void> canceller() {
+        return Future.wait([
+          client.unsubscribe('$_presenceDeliveryChannel.1'),
+          client.unsubscribe('$_privateDeliveryChannel.${user.id}'),
+        ]);
+      }
+
+      service.value = SubscriptionPusherState(canceller: canceller);
     } catch (error) {
       service.value = FailurePusherState(
         message: error.toString(),

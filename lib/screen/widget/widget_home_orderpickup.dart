@@ -15,10 +15,7 @@ class HomeOrderPickupAppBar extends StatelessWidget {
       middle: Row(
         mainAxisSize: MainAxisSize.min,
         children: const [
-          Icon(
-            CupertinoIcons.cube_box_fill,
-            color: CupertinoColors.systemGrey,
-          ),
+          Icon(CupertinoIcons.cube_box_fill, color: CupertinoColors.systemGrey),
           SizedBox(width: 8.0),
           Text('Ramassage de commande'),
         ],

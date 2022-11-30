@@ -7,12 +7,15 @@ class ClientSchema extends Equatable {
     required this.accessToken,
     required this.fullName,
     required this.phoneNumber,
+    required this.id,
   });
 
+  static const idKey = 'id';
   static const fullNameKey = 'full_name';
   static const accessTokenKey = 'accessToken';
   static const phoneNumberKey = 'phone_number';
 
+  final int? id;
   final String fullName;
   final String phoneNumber;
   final String accessToken;
@@ -29,11 +32,13 @@ class ClientSchema extends Equatable {
   }
 
   ClientSchema copyWith({
+    int? id,
     String? fullName,
     String? accessToken,
     String? phoneNumber,
   }) {
     return ClientSchema(
+      id: id ?? this.id,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       fullName: fullName ?? this.fullName,
       accessToken: accessToken ?? this.accessToken,
@@ -42,6 +47,8 @@ class ClientSchema extends Equatable {
 
   ClientSchema clone() {
     return copyWith(
+      id: id,
+      phoneNumber: phoneNumber,
       fullName: fullName,
       accessToken: accessToken,
     );
@@ -50,6 +57,7 @@ class ClientSchema extends Equatable {
   static ClientSchema fromServerMap(Map<String, dynamic> value) {
     final Map<String, dynamic> data = value['data'];
     return ClientSchema(
+      id: (data[idKey] as num).toInt(),
       phoneNumber: data[phoneNumberKey],
       fullName: data[fullNameKey],
       accessToken: value[accessTokenKey],
@@ -58,6 +66,7 @@ class ClientSchema extends Equatable {
 
   static ClientSchema fromMap(Map<String, dynamic> value) {
     return ClientSchema(
+      id: (value[idKey] as num).toInt(),
       phoneNumber: value[phoneNumberKey],
       fullName: value[fullNameKey],
       accessToken: value[accessTokenKey],
@@ -66,6 +75,7 @@ class ClientSchema extends Equatable {
 
   Map<String, dynamic> toMap() {
     return {
+      idKey: id,
       phoneNumberKey: phoneNumber,
       fullNameKey: fullName,
       accessTokenKey: accessToken,

@@ -13,5 +13,7 @@ export 'service_country_state.dart';
 export 'service_country.dart';
 export 'service_location_state.dart';
 export 'service_location.dart';
+export 'service_order_state.dart';
+export 'service_order.dart';
 export 'service_pusher_state.dart';
 export 'service_pusher.dart';
