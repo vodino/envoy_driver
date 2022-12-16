@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 
 import '_service.dart';
@@ -11,6 +13,7 @@ Future<void> runService() async {
   }
   await service._initialize();
 
+  LocaleService.instance().getLocale();
   await ClientService.instance().handle(const GetClient());
 }
 
@@ -27,6 +30,7 @@ class DevelopmentService extends Service {
     RepositoryService.development();
     await FirebaseService.development();
     await HiveService.developement();
+    await IsarService.developement();
   }
 }
 
@@ -38,5 +42,6 @@ class ProductionService extends Service {
     RepositoryService.production();
     await FirebaseService.production();
     await HiveService.production();
+    await IsarService.production();
   }
 }

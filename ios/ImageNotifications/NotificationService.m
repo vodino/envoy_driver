@@ -22,7 +22,6 @@
     self.bestAttemptContent = [request.content mutableCopy];
     
     [[FIRMessaging extensionHelper] populateNotificationContent:self.bestAttemptContent withContentHandler:contentHandler];
-    
 }
 
 - (void)serviceExtensionTimeWillExpire {

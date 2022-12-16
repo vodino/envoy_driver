@@ -8,6 +8,8 @@ version: 1.0.0+1
 environment:
   sdk: '>=2.18.4 <3.0.0'
 
+isar_version: &isar_version ^3.0.6-dev.0
+
 dependencies:
   
   cupertino_icons:
@@ -19,6 +21,7 @@ dependencies:
     sdk: flutter
   equatable:
   go_router:
+  jiffy:
   intl:
 
   # Widgets
@@ -26,7 +29,6 @@ dependencies:
   flutter_rating_bar:
   loading_indicator:
   slide_countdown:
-  dart_pusher_channels:
   auto_size_text:
   flutter_svg:
   shimmer:
@@ -35,20 +37,20 @@ dependencies:
   pinput:
 
   # Location and Geocoding
-  location:
   maplibre_gl:
     git:
       url: https://github.com/m0nac0/flutter-maplibre-gl.git
       ref: main
   
   # Service
-  pusher_client:
-    git:
-      url: https://github.com/thijskuilman/pusher_client.git
   firebase_messaging:
+  isar_flutter_libs: *isar_version
   firebase_auth:
   firebase_core:
+  image_picker:
   hive_flutter:
+  location:
+  isar: *isar_version
   hive:
   dio:
 
@@ -56,6 +58,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_gen_runner:
+  isar_generator: *isar_version
   flutter_lints:
   build_runner:
 

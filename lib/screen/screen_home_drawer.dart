@@ -47,7 +47,7 @@ class HomeDrawer extends StatelessWidget {
               child: CustomListTile(
                 leading: const Icon(CupertinoIcons.cube_box),
                 title: const Text('Commandes'),
-                onTap: () {},
+                onTap: () => context.pushNamed(OrderRecordingScreen.name),
               ),
             ),
             SliverToBoxAdapter(
@@ -79,7 +79,7 @@ class HomeDrawer extends StatelessWidget {
                   const Divider(),
                   CustomListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    onTap: () {},
+                    onTap: () => context.pushNamed(SettingsScreen.name),
                     leading: const Icon(CupertinoIcons.gear),
                     title: const Text('Paramètres'),
                     height: 55.0,

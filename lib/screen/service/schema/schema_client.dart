@@ -1,13 +1,31 @@
 import 'dart:convert';
 
-import 'package:equatable/equatable.dart';
+import 'package:isar/isar.dart';
 
-class ClientSchema extends Equatable {
-  const ClientSchema({
-    required this.accessToken,
-    required this.fullName,
-    required this.phoneNumber,
-    required this.id,
+part 'schema_client.g.dart';
+
+enum ClientStatus {
+  online('online'),
+  offline('offline');
+
+  const ClientStatus(this.value);
+  final String value;
+
+  static ClientStatus? fromString(String value) {
+    for (final item in values) {
+      if (item.value == value) return item;
+    }
+    return null;
+  }
+}
+
+@embedded
+class Client {
+  Client({
+    this.id,
+    this.accessToken,
+    this.fullName,
+    this.phoneNumber,
   });
 
   static const idKey = 'id';
@@ -15,29 +33,23 @@ class ClientSchema extends Equatable {
   static const accessTokenKey = 'accessToken';
   static const phoneNumberKey = 'phone_number';
 
-  final int? id;
-  final String fullName;
-  final String phoneNumber;
-  final String accessToken;
-
-  @override
-  List<Object?> get props => [
-        fullName,
-        accessToken,
-      ];
+  int? id;
+  String? fullName;
+  String? phoneNumber;
+  String? accessToken;
 
   @override
   String toString() {
     return toMap().toString();
   }
 
-  ClientSchema copyWith({
+  Client copyWith({
     int? id,
     String? fullName,
     String? accessToken,
     String? phoneNumber,
   }) {
-    return ClientSchema(
+    return Client(
       id: id ?? this.id,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       fullName: fullName ?? this.fullName,
@@ -45,28 +57,18 @@ class ClientSchema extends Equatable {
     );
   }
 
-  ClientSchema clone() {
+  Client clone() {
     return copyWith(
       id: id,
-      phoneNumber: phoneNumber,
       fullName: fullName,
+      phoneNumber: phoneNumber,
       accessToken: accessToken,
     );
   }
 
-  static ClientSchema fromServerMap(Map<String, dynamic> value) {
-    final Map<String, dynamic> data = value['data'];
-    return ClientSchema(
-      id: (data[idKey] as num).toInt(),
-      phoneNumber: data[phoneNumberKey],
-      fullName: data[fullNameKey],
-      accessToken: value[accessTokenKey],
-    );
-  }
-
-  static ClientSchema fromMap(Map<String, dynamic> value) {
-    return ClientSchema(
-      id: (value[idKey] as num).toInt(),
+  static Client fromMap(Map<String, dynamic> value) {
+    return Client(
+      id: value[idKey],
       phoneNumber: value[phoneNumberKey],
       fullName: value[fullNameKey],
       accessToken: value[accessTokenKey],
@@ -82,17 +84,18 @@ class ClientSchema extends Equatable {
     };
   }
 
-  static List<ClientSchema> fromServerListJson(String source) {
-    return List.of(
-      (jsonDecode(source)['data'] as List).map((map) => fromMap(map)),
+  static List<Client> fromServerListJson(String source) {
+    return List.of((jsonDecode(source)['data'] as List).map((map) => fromMap(map)));
+  }
+
+  static Client fromServerJson(String source) {
+    final data = jsonDecode(source);
+    return fromMap(data['data']).copyWith(
+      accessToken: data[accessTokenKey],
     );
   }
 
-  static ClientSchema fromServerJson(String source) {
-    return fromServerMap(jsonDecode(source));
-  }
-
-  static ClientSchema fromJson(String source) {
+  static Client fromJson(String source) {
     return fromMap(jsonDecode(source));
   }
 

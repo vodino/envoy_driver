@@ -5,25 +5,58 @@ import 'package:slide_countdown/slide_countdown.dart';
 import '_screen.dart';
 
 class HomeOrderNewScreen extends StatefulWidget {
-  const HomeOrderNewScreen({super.key});
+  const HomeOrderNewScreen({
+    super.key,
+    required this.order,
+  });
+
+  final Order order;
 
   @override
   State<HomeOrderNewScreen> createState() => _HomeOrderNewScreenState();
 }
 
 class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
-  late Duration _totalDuration;
+  /// Customer
+  late final Duration _timeout;
+
+  void _onTimeout() {
+    Navigator.pop(context);
+  }
+
+  /// OrderService
+  late final OrderService _orderService;
+
+  void _acceptOrder() {
+    _orderService.handle(
+      ChangeOrderStatus(
+        status: OrderStatus.accepted,
+        order: widget.order,
+      ),
+    );
+  }
+
+  void _listenOrderState(BuildContext context, OrderState state) {
+    if (state is OrderItemState) {
+      Navigator.pop(context, widget.order);
+    } else if (state is FailureOrderState) {}
+  }
 
   @override
   void initState() {
     super.initState();
-    _totalDuration = const Duration(seconds: 30);
+
+    /// Customer
+    _timeout = const Duration(seconds: 30);
+
+    /// OrderService
+    _orderService = OrderService();
   }
 
   @override
   Widget build(BuildContext context) {
     return FractionallySizedBox(
-      heightFactor: 0.5,
+      heightFactor: 0.7,
       child: Scaffold(
         body: BottomAppBar(
           elevation: 0.0,
@@ -40,7 +73,8 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
                     const HomeOrderNewLoading(),
                     const SizedBox(height: 16.0),
                     SlideCountdownSeparated(
-                      duration: _totalDuration,
+                      duration: _timeout,
+                      onDone: _onTimeout,
                       icon: Text(
                         'Vous avez ',
                         style: context.cupertinoTheme.textTheme.textStyle,
@@ -57,25 +91,41 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: CustomOutlineButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Refuser'),
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: CupertinoButton.filled(
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Accepter'),
-                      ),
-                    ),
-                  ],
+                child: ValueListenableConsumer<OrderState>(
+                  listener: _listenOrderState,
+                  valueListenable: _orderService,
+                  builder: (context, orderState, child) {
+                    VoidCallback? onAcceptPressed = _acceptOrder;
+                    VoidCallback? onDeclinePressed = () => Navigator.pop(context);
+                    if (orderState is PendingOrderState) {
+                      onAcceptPressed = null;
+                      onDeclinePressed = null;
+                    }
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: CustomOutlineButton(
+                            onPressed: onDeclinePressed,
+                            child: const Text('Refuser'),
+                          ),
+                        ),
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          child: CupertinoButton.filled(
+                            onPressed: onAcceptPressed,
+                            padding: const EdgeInsets.symmetric(vertical: 14.0),
+                            child: Visibility(
+                              visible: onAcceptPressed != null,
+                              replacement: const CupertinoActivityIndicator(),
+                              child: const Text('Accepter'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              )
+              ),
             ],
           ),
         ),

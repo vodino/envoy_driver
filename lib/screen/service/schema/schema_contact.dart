@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:isar/isar.dart';
 
-import 'package:equatable/equatable.dart';
+part 'schema_contact.g.dart';
 
-class ContactSchema extends Equatable {
-  const ContactSchema({
+@embedded
+class Contact {
+  Contact({
     this.name,
     this.phones,
   });
@@ -11,34 +13,28 @@ class ContactSchema extends Equatable {
   static const nameKey = 'name';
   static const phonesKey = 'phones';
 
-  final String? name;
-  final List<String>? phones;
+  String? name;
+  List<String>? phones;
 
-  @override
-  List<Object?> get props => [
-        name,
-        phones,
-      ];
-
-  ContactSchema copyWith({
+  Contact copyWith({
     String? name,
     List<String>? phones,
   }) {
-    return ContactSchema(
+    return Contact(
       name: name ?? this.name,
       phones: phones ?? this.phones,
     );
   }
 
-  ContactSchema clone() {
+  Contact clone() {
     return copyWith(
       name: name,
       phones: phones,
     );
   }
 
-  static ContactSchema fromMap(Map<String, dynamic> data) {
-    return ContactSchema(
+  static Contact fromMap(Map<String, dynamic> data) {
+    return Contact(
       name: data[nameKey],
       phones: data[phonesKey],
     );
@@ -55,17 +51,17 @@ class ContactSchema extends Equatable {
     return jsonEncode(toMap());
   }
 
-  static ContactSchema fromJson(String value) {
+  static Contact fromJson(String value) {
     return fromMap(jsonDecode(value));
   }
 
-  static List<ContactSchema> fromJsonList(String value) {
+  static List<Contact> fromJsonList(String value) {
     return List.of(
       (jsonDecode(value) as List).map((map) => fromMap(map)),
     );
   }
 
-  static String toJsonList(List<ContactSchema> value) {
+  static String toJsonList(List<Contact> value) {
     return jsonEncode(List.of(value.map((e) => e.toMap())));
   }
 

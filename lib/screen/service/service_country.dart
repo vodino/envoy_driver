@@ -28,13 +28,13 @@ abstract class CountryEvent {
 class GetCountries extends CountryEvent {
   const GetCountries();
 
-  String get url => '${RepositoryService.httpURL}/v1/api/countries';
+  String get _url => '${RepositoryService.httpURL}/v1/api/countries';
 
   @override
   Future<void> _execute(CountryService service) async {
     service.value = const PendingCountryState();
     try {
-      final response = await Dio().getUri<String>(Uri.parse(url));
+      final response = await Dio().getUri<String>(Uri.parse(_url));
       final data = compute(CountrySchema.fromListJson, response.data!);
       data.then(
         (data) async {

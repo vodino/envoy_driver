@@ -38,6 +38,14 @@ class $AssetsImagesGen {
   /// File path: assets/images/lottiebox.zip
   String get lottiebox => 'assets/images/lottiebox.zip';
 
+  /// File path: assets/images/mappin_blue.png
+  AssetGenImage get mappinBlue =>
+      const AssetGenImage('assets/images/mappin_blue.png');
+
+  /// File path: assets/images/mappin_orange.png
+  AssetGenImage get mappinOrange =>
+      const AssetGenImage('assets/images/mappin_orange.png');
+
   /// File path: assets/images/money-stack.svg
   SvgGenImage get moneyStack =>
       const SvgGenImage('assets/images/money-stack.svg');
@@ -46,8 +54,16 @@ class $AssetsImagesGen {
   String get motorbike => 'assets/images/motorbike.zip';
 
   /// List of all assets
-  List<dynamic> get values =>
-      [box, envoyBlueIcon, envoyIcon, lottiebox, moneyStack, motorbike];
+  List<dynamic> get values => [
+        box,
+        envoyBlueIcon,
+        envoyIcon,
+        lottiebox,
+        mappinBlue,
+        mappinOrange,
+        moneyStack,
+        motorbike
+      ];
 }
 
 class Assets {

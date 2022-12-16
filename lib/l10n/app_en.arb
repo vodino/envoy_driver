@@ -1,2 +1,17 @@
 {
+    "wheretodelivery": "where to deliver?",
+    "profile": "account",
+    "orders": "orders",
+    "discounts": "discounts",
+    "business": "business",
+    "faq": "frequently asked questions",
+    "support": "support",
+    "settings": "settings",
+    "english": "english",
+    "french": "french",
+    "receivingcalls": "receiving calls",
+    "notifications": "notifications",
+    "language": "language",
+    "selectlanguage": "Select a language",
+    "logout": "logout"
 }

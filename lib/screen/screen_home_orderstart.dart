@@ -1,15 +1,73 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:maplibre_gl/mapbox_gl.dart';
 
 import '_screen.dart';
 
-class HomeOrderStartScreen extends StatelessWidget {
+class HomeOrderStartScreen extends StatefulWidget {
   const HomeOrderStartScreen({
     super.key,
     required this.popController,
+    required this.order,
   });
 
-  final ValueNotifier<bool?> popController;
+  final ValueNotifier<Order?> popController;
+  final Order order;
+
+  @override
+  State<HomeOrderStartScreen> createState() => _HomeOrderStartScreenState();
+}
+
+class _HomeOrderStartScreenState extends State<HomeOrderStartScreen> {
+  /// OrderService
+  late final OrderService _orderService;
+
+  void _listenOrderState(BuildContext context, OrderState state) {
+    if (state is OrderItemState) {
+      widget.popController.value = widget.order;
+      Navigator.pop(context);
+    }
+  }
+
+  void _startOrder() {
+    _orderService.handle(
+      ChangeOrderStatus(
+        status: OrderStatus.started,
+        order: widget.order,
+      ),
+    );
+  }
+
+  /// RouteService
+  late final RouteService _travelRouteService;
+
+  void _getRoute() {
+    _travelRouteService.handle(GetRoute(
+      destination: LatLng(
+        widget.order.deliveryPlace!.latitude!,
+        widget.order.deliveryPlace!.longitude!,
+      ),
+      source: LatLng(
+        widget.order.pickupPlace!.latitude!,
+        widget.order.pickupPlace!.longitude!,
+      ),
+    ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// OrderService
+    _orderService = OrderService();
+
+    /// RouteService
+    _travelRouteService = RouteService.travelInstance();
+    _getRoute();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +87,17 @@ class HomeOrderStartScreen extends StatelessWidget {
                   CustomListTile(
                     leading: const Icon(CupertinoIcons.circle, color: CupertinoColors.activeBlue, size: 16.0),
                     title: Text(
-                      "Quartier Akeikoi",
+                      widget.order.pickupPlace!.title!,
                       style: context.cupertinoTheme.textTheme.textStyle,
                     ),
-                    onTap: () {},
                   ),
                   const Divider(),
                   CustomListTile(
                     leading: const Icon(CupertinoIcons.circle, color: CupertinoColors.activeOrange, size: 16.0),
                     title: Text(
-                      "Adjamé Mairie",
+                      widget.order.deliveryPlace!.title!,
                       style: context.cupertinoTheme.textTheme.textStyle,
                     ),
-                    onTap: () {},
                   ),
                   const SizedBox(height: 8.0),
                   const Divider(thickness: 8.0, height: 12.0),
@@ -51,7 +107,7 @@ class HomeOrderStartScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "500 FCFA",
+                          "${widget.order.price} FCFA",
                           style: context.cupertinoTheme.textTheme.navTitleTextStyle.copyWith(
                             fontWeight: FontWeight.bold,
                             letterSpacing: -1.0,
@@ -61,7 +117,6 @@ class HomeOrderStartScreen extends StatelessWidget {
                         Assets.images.moneyStack.svg(height: 24.0),
                       ],
                     ),
-                    onTap: () {},
                   ),
                   CustomListTile(
                     title: const Text('Distance :'),
@@ -76,21 +131,42 @@ class HomeOrderStartScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8.0),
-                        const Icon(CupertinoIcons.arrow_branch)
+                        const Icon(CupertinoIcons.arrow_branch),
                       ],
                     ),
-                    onTap: () {},
                   ),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: CupertinoButton.filled(
-                child: const Text('Commencer'),
-                onPressed: () {
-                  popController.value = true;
-                  Navigator.pop(context);
+              child: CounterBuilder(
+                duration: widget.order.scheduledDate?.difference(DateTime.now()) ?? Duration.zero,
+                builder: (context, duration, child) {
+                  return ValueListenableConsumer<OrderState>(
+                    listener: _listenOrderState,
+                    valueListenable: _orderService,
+                    builder: (context, state, child) {
+                      VoidCallback? onPressed = _startOrder;
+                      if (state is PendingOrderState) onPressed = null;
+                      if (duration.inSeconds != 0) onPressed = null;
+                      final style = TextStyle(color: onPressed == null ? CupertinoColors.systemGrey2 : null);
+                      Jiffy.locale(window.locale.languageCode);
+                      final jiffy = Jiffy({"year": widget.order.scheduledDate?.year, "month": widget.order.scheduledDate?.month, "day": widget.order.scheduledDate?.day, "hour": widget.order.scheduledDate?.hour, "minute": widget.order.scheduledDate?.minute});
+                      return CupertinoButton.filled(
+                        padding: EdgeInsets.zero,
+                        onPressed: onPressed,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Visibility(
+                            visible: state is! PendingOrderState,
+                            replacement: const CupertinoActivityIndicator(),
+                            child: Text('Commencer${duration != Duration.zero ? ' ${jiffy.fromNow()}' : ''}', style: style),
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
             ),

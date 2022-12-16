@@ -1,2 +1,17 @@
 {
+    "wheretodelivery": "où livrer ?",
+    "profile": "profil",
+    "orders": "commandes",
+    "discounts": "réductions",
+    "business": "business",
+    "faq": "foire aux questions",
+    "support": "support",
+    "settings": "paramètres",
+    "english": "anglais",
+    "french": "français",
+    "receivingcalls": "réception d'appels",
+    "notifications": "notifications",
+    "language": "langue",
+    "selectlanguage": "selectionner une langue",
+    "logout": "deconnexion"
 }

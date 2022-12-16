@@ -66,6 +66,10 @@ PODS:
   - GoogleUtilities/UserDefaults (7.8.0):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (2.1.0)
+  - image_picker_ios (0.0.1):
+    - Flutter
+  - isar_flutter_libs (1.0.0):
+    - Flutter
   - location (0.0.1):
     - Flutter
   - MapLibre (5.12.2)
@@ -80,19 +84,11 @@ PODS:
     - nanopb/encode (= 2.30909.0)
   - nanopb/decode (2.30909.0)
   - nanopb/encode (2.30909.0)
-  - NWWebSocket (0.5.2)
   - path_provider_ios (0.0.1):
     - Flutter
   - PromisesObjC (2.1.1)
-  - pusher_client (2.0.0):
-    - Flutter
-    - PusherSwift (~> 9.0)
-  - PusherSwift (9.2.2):
-    - NWWebSocket (~> 0.5.2)
-    - TweetNacl (~> 1.0.0)
   - smart_auth (0.0.1):
     - Flutter
-  - TweetNacl (1.0.2)
 
 DEPENDENCIES:
   - Firebase/Messaging
@@ -100,12 +96,13 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
   - location (from `.symlinks/plugins/location/ios`)
   - MapLibre
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
   - MapLibreAnnotationExtension
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
-  - pusher_client (from `.symlinks/plugins/pusher_client/ios`)
   - smart_auth (from `.symlinks/plugins/smart_auth/ios`)
 
 SPEC REPOS:
@@ -123,10 +120,7 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMSessionFetcher
     - nanopb
-    - NWWebSocket
     - PromisesObjC
-    - PusherSwift
-    - TweetNacl
 
 EXTERNAL SOURCES:
   firebase_auth:
@@ -137,14 +131,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
+  isar_flutter_libs:
+    :path: ".symlinks/plugins/isar_flutter_libs/ios"
   location:
     :path: ".symlinks/plugins/location/ios"
   maplibre_gl:
     :path: ".symlinks/plugins/maplibre_gl/ios"
   path_provider_ios:
     :path: ".symlinks/plugins/path_provider_ios/ios"
-  pusher_client:
-    :path: ".symlinks/plugins/pusher_client/ios"
   smart_auth:
     :path: ".symlinks/plugins/smart_auth/ios"
 
@@ -162,19 +158,17 @@ SPEC CHECKSUMS:
   GoogleDataTransport: 1c8145da7117bd68bbbed00cf304edb6a24de00f
   GoogleUtilities: 1d20a6ad97ef46f67bbdec158ce00563a671ebb7
   GTMSessionFetcher: ffbb25ec00ebcb5201adab0a56d808f6f1902d9f
+  image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
+  isar_flutter_libs: b69f437aeab9c521821c3f376198c4371fa21073
   location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
   MapLibre: 5aa820115d91293a4d09e681e7470f88bd34b672
   maplibre_gl: 2a0ce99f40b3a133b0e8b40b5ef37e0562165399
   MapLibreAnnotationExtension: bc7f1041206218d7d24ba0908e3145cd54b86664
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
-  NWWebSocket: 21f0c73639815da3272862c912275b26102aa80c
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
-  pusher_client: ed0c4db398a6fb9cd6e461c06da4e4d4258c4451
-  PusherSwift: 8b252244aca6a662572be48a97b756d14cd7542c
   smart_auth: 4bedbc118723912d0e45a07e8ab34039c19e04f2
-  TweetNacl: 3abf4d1d2082b0114e7a67410e300892448951e6
 
-PODFILE CHECKSUM: 7338ad3caec370deb7b55e649f2d7f6673d9d2ba
+PODFILE CHECKSUM: 178e60e854bfbf10422ab7434fd1807393b97402
 
 COCOAPODS: 1.11.3

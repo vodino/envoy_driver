@@ -2,37 +2,39 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 import '_screen.dart';
 
-class HomeOfflineScreen extends StatefulWidget {
-  const HomeOfflineScreen({
+class HomeOnlineScreen extends StatefulWidget {
+  const HomeOnlineScreen({
     super.key,
     required this.popController,
   });
 
-  final ValueNotifier<bool?> popController;
+  final ValueNotifier<Order?> popController;
 
   @override
-  State<HomeOfflineScreen> createState() => _HomeOfflineScreenState();
+  State<HomeOnlineScreen> createState() => _HomeOnlineScreenState();
 }
 
-class _HomeOfflineScreenState extends State<HomeOfflineScreen> {
+class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBindingObserver {
   /// Customer
-  late final ValueNotifier<bool> _activeController;
+  static final ValueNotifier<bool> _activeController = ValueNotifier(false);
 
-  void _openNewOrderModal(OrderSchema data) async {
-    final value = await showModalBottomSheet<bool>(
+  void _openNewOrderModal(Order data) async {
+    final value = await showModalBottomSheet<Order>(
       context: context,
       enableDrag: false,
       isDismissible: false,
       isScrollControlled: true,
       builder: (context) {
-        return const HomeOrderNewScreen();
+        return HomeOrderNewScreen(order: data);
       },
     );
-    if (value != null) {
-      if (mounted) Navigator.pop(context, data);
+    if (value != null && mounted) {
+      widget.popController.value = value;
+      Navigator.pop(context);
     }
   }
 
@@ -41,87 +43,153 @@ class _HomeOfflineScreenState extends State<HomeOfflineScreen> {
   Future<void> Function()? _canceller;
 
   void _listenOrderState(BuildContext context, OrderState state) {
-    print(state);
     if (state is SubscriptionOrderState) {
       _canceller = state.canceller;
-    } else if (state is NewOrderOrderState) {
+      _activeController.value = true;
+    } else if (state is OrderItemState) {
       _openNewOrderModal(state.data);
     } else if (state is FailureOrderState) {
-      // _activeController.value = false;
-      // _canceller?.call();
+      _activeController.value = false;
+      _canceller?.call();
     }
   }
 
-  void _subscribe() {
-    _activeController.value = true;
-    _orderService.handle(const SubscribeNewOrder());
+  Future<void> _subscribe() async {
+    _orderService.handle(const SubscribeToOrder());
   }
 
-  void _unsubscribe() async {
-    await _canceller?.call();
+  Future<bool> _unsubscribe() async {
+    await _cancel();
     _activeController.value = false;
+    return true;
+  }
+
+  Future<bool> _cancel() async {
+    await _canceller?.call();
+    await _locationSubscription?.cancel();
+    return true;
+  }
+
+  /// LocationService
+  late final LocationService _locationService;
+  StreamSubscription? _locationSubscription;
+  LocationData? _userLocation;
+
+  void _listenLocationState(BuildContext context, LocationState state) {
+    if (state is LocationItemState) {
+      _locationSubscription = state.subscription;
+      _userLocation = state.data;
+      if (_activeController.value) _updateLocation(_userLocation!);
+    }
+  }
+
+  /// ClientService
+  late final ClientService _clientService;
+
+  void _listenClientState(BuildContext context, ClientState state) {}
+
+  void _updateLocation(LocationData position) {
+    _clientService.handle(UpdateLocation(
+      longitude: position.longitude!,
+      latitude: position.latitude!,
+    ));
   }
 
   @override
   void initState() {
     super.initState();
 
-    /// Customer
-    _activeController = ValueNotifier(false);
-
     /// OrderService
-    _orderService = OrderService();
+    _orderService = OrderService.instance();
+    if (_activeController.value) _subscribe();
+
+    /// LocationService
+    _locationService = LocationService.instance();
+
+    /// ClientService
+    _clientService = ClientService();
+  }
+
+  @override
+  void dispose() {
+    /// OrderService
+    _cancel();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      heightFactor: 0.5,
-      child: BottomAppBar(
-        elevation: 0.0,
-        color: Colors.transparent,
-        child: ValueListenableConsumer<OrderState>(
-            listener: _listenOrderState,
-            valueListenable: _orderService,
-            builder: (context, pusherState, child) {
-              return ValueListenableBuilder<bool>(
-                valueListenable: _activeController,
-                builder: (context, active, child) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      HomeSearchAppBar(active: active),
-                      Expanded(child: HomeSearchLoading(active: active)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                        child: Visibility(
-                          visible: active,
-                          replacement: Builder(
-                            builder: (context) {
-                              VoidCallback? onPressed = _subscribe;
-                              if (pusherState is PendingPusherState) onPressed = null;
-                              return CupertinoButton.filled(
-                                onPressed: onPressed,
-                                child: Visibility(
-                                  visible: onPressed != null,
-                                  replacement: const CupertinoActivityIndicator.partiallyRevealed(),
-                                  child: const Text('Se mettre en ligne'),
-                                ),
-                              );
-                            },
-                          ),
-                          child: CustomOutlineButton(
-                            onPressed: _unsubscribe,
-                            child: const Text('Arrêter'),
+    return WillPopScope(
+      onWillPop: _cancel,
+      child: ValueListenableListener<ClientState>(
+        listener: _listenClientState,
+        valueListenable: _clientService,
+        child: ValueListenableListener<LocationState>(
+          initiated: true,
+          listener: _listenLocationState,
+          valueListenable: _locationService,
+          child: FractionallySizedBox(
+            heightFactor: 0.5,
+            child: BottomAppBar(
+              elevation: 0.0,
+              color: Colors.transparent,
+              child: ValueListenableListener<OrderState>(
+                listener: _listenOrderState,
+                valueListenable: _orderService,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _activeController,
+                  builder: (context, active, child) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        HomeSearchAppBar(active: active),
+                        Expanded(child: HomeSearchLoading(active: active)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: Visibility(
+                            visible: active,
+                            replacement: ValueListenableBuilder<OrderState>(
+                              valueListenable: _orderService,
+                              builder: (context, orderState, child) {
+                                VoidCallback? onPressed = _subscribe;
+                                if (orderState is PendingOrderState) onPressed = null;
+                                return CupertinoButton.filled(
+                                  onPressed: onPressed,
+                                  child: Visibility(
+                                    visible: onPressed != null,
+                                    replacement: const CupertinoActivityIndicator(),
+                                    child: const Text('Se mettre en ligne'),
+                                  ),
+                                );
+                              },
+                            ),
+                            child: ValueListenableBuilder<OrderState>(
+                              valueListenable: _orderService,
+                              builder: (context, orderState, child) {
+                                VoidCallback? onPressed = _unsubscribe;
+                                if (orderState is PendingOrderState) onPressed = null;
+                                return CustomOutlineButton(
+                                  onPressed: onPressed,
+                                  child: Visibility(
+                                    visible: onPressed != null,
+                                    replacement: const CupertinoActivityIndicator(),
+                                    child: const Text('Arrêter'),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                },
-              );
-            }),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

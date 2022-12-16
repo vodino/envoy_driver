@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+
+import '_service.dart';
 
 enum Env {
   production('production'),
@@ -9,6 +12,25 @@ enum Env {
   const Env(this.value);
 
   final String value;
+}
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  if (kDebugMode) {
+    await IsarService.developement();
+    await FirebaseService.development();
+  } else {
+    await IsarService.production();
+    await FirebaseService.production();
+  }
+
+  /// OrderService
+  final data = Order.fromFirebaseMap(message.data);
+  if (data.status != null) {
+    OrderService().handle(PutOrderList(data: [data]));
+  } else {
+    OrderService.instance().value = OrderItemState(data: data);
+  }
 }
 
 class FirebaseService {

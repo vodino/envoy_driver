@@ -1,11 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'screen/_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await runAssets();
   await runService();
   runApp(const MyApp());
@@ -20,10 +22,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final GoRouter _router;
+  late final LocaleService _localeService;
 
   @override
   void initState() {
     super.initState();
+    _localeService = LocaleService.instance();
     _router = GoRouter(
       routes: [
         GoRoute(
@@ -63,6 +67,17 @@ class _MyAppState extends State<MyApp> {
               },
             ),
             GoRoute(
+              path: OrderRecordingScreen.path,
+              name: OrderRecordingScreen.name,
+              pageBuilder: (context, state) {
+                return const CupertinoPage(
+                  child: CustomKeepAlive(
+                    child: OrderRecordingScreen(),
+                  ),
+                );
+              },
+            ),
+            GoRoute(
               path: HelpFaqScreen.path,
               name: HelpFaqScreen.name,
               pageBuilder: (context, state) {
@@ -72,6 +87,30 @@ class _MyAppState extends State<MyApp> {
                   ),
                 );
               },
+            ),
+            GoRoute(
+              path: SettingsScreen.path,
+              name: SettingsScreen.name,
+              pageBuilder: (context, state) {
+                return const CupertinoPage(
+                  child: CustomKeepAlive(
+                    child: SettingsScreen(),
+                  ),
+                );
+              },
+              routes: [
+                GoRoute(
+                  path: SettingsLanguageScreen.path,
+                  name: SettingsLanguageScreen.name,
+                  pageBuilder: (context, state) {
+                    return const CupertinoPage(
+                      child: CustomKeepAlive(
+                        child: SettingsLanguageScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -126,18 +165,24 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      theme: Themes.theme,
-      themeMode: ThemeMode.light,
-      darkTheme: Themes.darkTheme,
-      color: Themes.primaryColor,
-      debugShowCheckedModeBanner: false,
-      routerDelegate: _router.routerDelegate,
-      scrollBehavior: const CustomScrollBehavior(),
-      supportedLocales: CustomBuildContext.supportedLocales,
-      routeInformationParser: _router.routeInformationParser,
-      routeInformationProvider: _router.routeInformationProvider,
-      localizationsDelegates: CustomBuildContext.localizationsDelegates,
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: _localeService,
+      builder: (context, locale, child) {
+        return MaterialApp.router(
+          locale: locale,
+          theme: Themes.theme,
+          themeMode: ThemeMode.light,
+          darkTheme: Themes.darkTheme,
+          color: Themes.primaryColor,
+          debugShowCheckedModeBanner: false,
+          routerDelegate: _router.routerDelegate,
+          scrollBehavior: const CustomScrollBehavior(),
+          supportedLocales: CustomBuildContext.supportedLocales,
+          routeInformationParser: _router.routeInformationParser,
+          routeInformationProvider: _router.routeInformationProvider,
+          localizationsDelegates: CustomBuildContext.localizationsDelegates,
+        );
+      },
     );
   }
 }

@@ -9,14 +9,18 @@ class ClientService extends ValueNotifier<ClientState> {
   ClientService([ClientState value = const InitClientState()]) : super(value);
 
   static ClientService? _instance;
-
   static ClientService instance([ClientState state = const InitClientState()]) {
     return _instance ??= ClientService(state);
   }
 
+  static ClientService? _navigationInstance;
+  static ClientService navigationInstance([ClientState state = const InitClientState()]) {
+    return _navigationInstance ??= ClientService(state);
+  }
+
   Future<void> handle(ClientEvent event) => event._execute(this);
 
-  static ClientSchema? get authenticated {
+  static Client? get authenticated {
     final state = ClientService.instance().value;
     if (state is ClientItemState) return state.data;
     return null;
@@ -55,7 +59,7 @@ class LoginClient extends ClientEvent {
       );
       switch (response.statusCode) {
         case 200:
-          final data = await compute(ClientSchema.fromServerJson, response.data!);
+          final data = await compute(Client.fromServerJson, response.data!);
           await service.handle(PutClient(client: data));
           break;
         case 404:
@@ -114,7 +118,7 @@ class RegisterClient extends ClientEvent {
       );
       switch (response.statusCode) {
         case 200:
-          final data = await compute(ClientSchema.fromServerJson, response.data!);
+          final data = await compute(Client.fromServerJson, response.data!);
           await service.handle(PutClient(client: data));
           break;
         case 404:
@@ -138,6 +142,107 @@ class RegisterClient extends ClientEvent {
   }
 }
 
+class SetClientStatus extends ClientEvent {
+  const SetClientStatus({
+    required this.status,
+  });
+
+  final ClientStatus status;
+
+  String get url => '${RepositoryService.httpURL}/v1/api/go/${status.value}';
+
+  @override
+  Future<void> _execute(ClientService service) async {
+    service.value = const PendingClientState();
+    try {
+      final client = ClientService.authenticated!;
+      final token = client.accessToken;
+      final response = await Dio().postUri<String>(
+        Uri.parse(url),
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        }),
+      );
+      switch (response.statusCode) {
+        case 200:
+          if (status == ClientStatus.online) {
+            service.value = const OnlineClient();
+          } else {
+            service.value = const OfflineClient();
+          }
+          break;
+        default:
+          service.value = FailureClientState(
+            message: response.data!,
+            event: this,
+          );
+      }
+    } catch (error) {
+      service.value = FailureClientState(
+        message: error.toString(),
+        event: this,
+      );
+    }
+  }
+}
+
+class UpdateLocation extends ClientEvent {
+  const UpdateLocation({
+    required this.latitude,
+    required this.longitude,
+    this.orderId,
+  });
+
+  final double latitude;
+  final double longitude;
+
+  final int? orderId;
+
+  String get url => '${RepositoryService.httpURL}/v1/api/riders/location';
+
+  @override
+  Future<void> _execute(ClientService service) async {
+    final client = ClientService.authenticated!;
+    final token = client.accessToken;
+    service.value = const PendingClientState();
+    try {
+      final body = {
+        'lat': latitude,
+        'long': longitude,
+        'delivery_id': orderId,
+      }..removeWhere((key, value) => value == null);
+      final response = await Dio().postUri<String>(
+        Uri.parse(url),
+        data: jsonEncode(body),
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        }),
+      );
+      switch (response.statusCode) {
+        case 200:
+          print(response.data);
+          break;
+        default:
+          service.value = FailureClientState(
+            message: response.data!,
+            event: this,
+          );
+      }
+    } catch (error) {
+      if (error is DioError) print(error.response?.data);
+      print(error);
+      service.value = FailureClientState(
+        message: error.toString(),
+        event: this,
+      );
+    }
+  }
+}
+
 class GetClient extends ClientEvent {
   const GetClient();
 
@@ -147,7 +252,7 @@ class GetClient extends ClientEvent {
     try {
       final value = HiveService.settingsBox.get('current_client');
       if (value != null) {
-        final data = ClientSchema.fromJson(value);
+        final data = Client.fromJson(value);
         service.value = ClientItemState(data: data);
       } else {
         service.value = const NoClientItemState();
@@ -166,7 +271,7 @@ class PutClient extends ClientEvent {
     required this.client,
   });
 
-  final ClientSchema client;
+  final Client client;
 
   @override
   Future<void> _execute(ClientService service) async {
@@ -188,7 +293,7 @@ class DeleteClient extends ClientEvent {
     required this.client,
   });
 
-  final ClientSchema client;
+  final Client client;
 
   @override
   Future<void> _execute(ClientService service) async {

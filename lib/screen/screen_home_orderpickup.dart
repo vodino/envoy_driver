@@ -1,72 +1,212 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
+import 'package:maplibre_gl/mapbox_gl.dart';
 
 import '_screen.dart';
 
-class HomeOrderPickupScreen extends StatelessWidget {
+class HomeOrderPickupScreen extends StatefulWidget {
   const HomeOrderPickupScreen({
     super.key,
     required this.popController,
+    required this.order,
   });
 
-  final ValueNotifier<bool?> popController;
+  final ValueNotifier<Order?> popController;
+  final Order order;
+
+  @override
+  State<HomeOrderPickupScreen> createState() => _HomeOrderPickupScreenState();
+}
+
+class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
+  /// OrderService
+  late final OrderService _orderService;
+
+  void _listenOrderState(BuildContext context, OrderState state) {
+    if (state is OrderItemState) {
+      widget.popController.value = widget.order;
+      Navigator.pop(context);
+    }
+  }
+
+  void _pickupOrder() {
+    _orderService.handle(
+      ChangeOrderStatus(
+        status: OrderStatus.collected,
+        order: widget.order,
+      ),
+    );
+  }
+
+  /// LocationService
+  late final LocationService _locationService;
+  StreamSubscription? _locationSubscription;
+  LocationData? _userLocation;
+
+  void _listenLocationState(BuildContext context, LocationState state) {
+    if (state is LocationItemState) {
+      _locationSubscription = state.subscription;
+      _userLocation = state.data;
+      _updateLocation(_userLocation!);
+      _getPickupRoute(_userLocation!);
+    }
+  }
+
+  /// ClientService
+  late final ClientService _clientService;
+
+  void _listenClientState(BuildContext context, ClientState state) {
+    print(state);
+  }
+
+  void _updateLocation(LocationData position) {
+    _clientService.handle(UpdateLocation(
+      longitude: position.longitude!,
+      latitude: position.latitude!,
+      orderId: widget.order.id,
+    ));
+  }
+
+  /// RouteService
+  late final RouteService _travelRouteService;
+  late final RouteService _pickupRouteService;
+
+  void _getRoute() {
+    _travelRouteService.handle(GetRoute(
+      destination: LatLng(
+        widget.order.deliveryPlace!.latitude!,
+        widget.order.deliveryPlace!.longitude!,
+      ),
+      source: LatLng(
+        widget.order.pickupPlace!.latitude!,
+        widget.order.pickupPlace!.longitude!,
+      ),
+    ));
+  }
+
+  void _getPickupRoute(LocationData position) {
+    _pickupRouteService.handle(GetRoute(
+      destination: LatLng(
+        widget.order.pickupPlace!.latitude!,
+        widget.order.pickupPlace!.longitude!,
+      ),
+      source: LatLng(
+        position.latitude!,
+        position.longitude!,
+      ),
+    ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// OrderService
+    _orderService = OrderService();
+
+    /// LocationService
+    _locationService = LocationService.instance();
+
+    /// RouteService
+    _travelRouteService = RouteService.travelInstance();
+    _pickupRouteService = RouteService.pickupInstance();
+    _getRoute();
+
+    /// ClientService
+    _clientService = ClientService();
+  }
+
+  @override
+  void dispose() {
+    /// LocationService
+    _locationSubscription?.cancel();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      heightFactor: 0.5,
-      child: BottomAppBar(
-        elevation: 0.0,
-        color: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const HomeOrderPickupAppBar(),
-            HomeOrderPickupTile(
-              color: CupertinoColors.activeBlue,
-              title: '+225 0749414602',
-              onPressed: () {},
-            ),
-            CustomListTile(
-              leading: const Icon(
-                CupertinoIcons.location_solid,
-                color: CupertinoColors.systemGrey2,
-              ),
-              title: Text(
-                'Quartier Akeikoi',
-                style: context.cupertinoTheme.textTheme.textStyle,
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Material(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                  color: CupertinoColors.systemGrey5,
+    return ValueListenableListener<ClientState>(
+      listener: _listenClientState,
+      valueListenable: _clientService,
+      child: ValueListenableListener<LocationState>(
+        initiated: true,
+        listener: _listenLocationState,
+        valueListenable: _locationService,
+        child: FractionallySizedBox(
+          heightFactor: 0.5,
+          child: BottomAppBar(
+            elevation: 0.0,
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const HomeOrderPickupAppBar(),
+                HomeOrderPickupTile(
+                  color: CupertinoColors.activeBlue,
+                  title: widget.order.pickupPhoneNumber!.phones!.join(', '),
+                  onPressed: () {},
+                ),
+                CustomListTile(
+                  leading: const Icon(
+                    CupertinoIcons.location_solid,
+                    color: CupertinoColors.systemGrey2,
+                  ),
+                  title: Text(
+                    widget.order.pickupPlace!.title!,
+                    style: context.cupertinoTheme.textTheme.textStyle,
+                  ),
+                ),
+                Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Recupere mon colis à Adjamé chez monsieur Karim et ramène ma nourriture au plus vite.',
-                          style: context.cupertinoTheme.textTheme.textStyle,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Material(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                      color: CupertinoColors.systemGrey5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              widget.order.pickupAdditionalInfo!,
+                              style: context.cupertinoTheme.textTheme.textStyle,
+                              overflow: TextOverflow.clip,
+                              softWrap: true,
+                            ),
+                            Visibility(
+                              visible: widget.order.audioPath != null,
+                              child: const CustomAudioPlayer(),
+                            ),
+                          ],
                         ),
-                        const CustomAudioPlayer(),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+                ValueListenableConsumer<OrderState>(
+                  listener: _listenOrderState,
+                  valueListenable: _orderService,
+                  builder: (context, state, child) {
+                    VoidCallback? onPressed = _pickupOrder;
+                    if (state is PendingOrderState) onPressed = null;
+                    return CustomSheetButton(
+                      onPressed: onPressed,
+                      child: Visibility(
+                        visible: onPressed != null,
+                        replacement: const CupertinoActivityIndicator(),
+                        child: const Text("J'ai collecté"),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-            CustomSheetButton(
-              child: const Text("J'ai récuperé"),
-              onPressed: () {
-                popController.value = true;
-                Navigator.pop(context);
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );

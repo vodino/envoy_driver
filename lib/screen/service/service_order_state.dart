@@ -30,8 +30,14 @@ class SubscriptionOrderState extends OrderState {
   final Future<void> Function() canceller;
 }
 
-class NewOrderOrderState extends OrderState {
-  const NewOrderOrderState({required this.data});
+class OrderItemState extends OrderState {
+  const OrderItemState({required this.data});
 
-  final OrderSchema data;
+  final Order data;
+}
+
+class OrderItemListState extends OrderState {
+  const OrderItemListState({required this.data});
+
+  final List<Order> data;
 }

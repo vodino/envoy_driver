@@ -267,3 +267,134 @@ class CustomLocationTile extends StatelessWidget {
     );
   }
 }
+
+
+class CustomTextFieldModal extends StatefulWidget {
+  const CustomTextFieldModal({
+    super.key,
+    this.value,
+    required this.hint,
+    required this.title,
+  });
+
+  final String hint;
+  final String? value;
+  final String title;
+
+  @override
+  State<CustomTextFieldModal> createState() => _CustomTextFieldModalState();
+}
+
+class _CustomTextFieldModalState extends State<CustomTextFieldModal> {
+  /// Customer
+  late final GlobalKey<FormState> _formKey;
+
+  late final TextEditingController _valueTextController;
+
+  String? _validator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Ce champ ne peut être vide';
+    }
+    return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// Customer
+    _formKey = GlobalKey();
+    _valueTextController = TextEditingController(text: widget.value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: Text(widget.title),
+      content: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Form(
+          key: _formKey,
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+            child: TextFormField(
+              autofocus: true,
+              validator: _validator,
+              controller: _valueTextController,
+              decoration: InputDecoration(
+                filled: true,
+                hintText: widget.hint,
+                fillColor: CupertinoColors.systemFill,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                border: const OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        CupertinoDialogAction(
+          isDestructiveAction: true,
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          child: const Text('Terminer'),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              Navigator.pop(context, _valueTextController.text);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
+
+class CustomCheckListTile extends StatelessWidget {
+  const CustomCheckListTile({
+    super.key,
+    this.title,
+    this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final Widget? title;
+  final Widget? subtitle;
+
+  final bool? value;
+  final ValueChanged<bool?>? onChanged;
+
+  void _onTap() {
+    if (value != null) {
+      onChanged?.call(!(value!));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomListTile(
+      title: title,
+      onTap: _onTap,
+      subtitle: subtitle,
+      trailing: Checkbox(
+        value: value,
+        onChanged: onChanged,
+        activeColor: CupertinoColors.activeGreen,
+        visualDensity: const VisualDensity(
+          vertical: VisualDensity.minimumDensity,
+          horizontal: VisualDensity.minimumDensity,
+        ),
+        side: const BorderSide(color: CupertinoColors.systemFill),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+      ),
+    );
+  }
+}

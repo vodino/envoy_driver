@@ -74,13 +74,16 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
         child: CustomScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           slivers: [
-            const SliverPadding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               sliver: SliverToBoxAdapter(
                 child: AspectRatio(
                   aspectRatio: 4.0,
-                  child: CircleAvatar(
-                    backgroundColor: CupertinoColors.systemGrey,
+                  child: CustomButton(
+                    onPressed: () {},
+                    child: const CircleAvatar(
+                      backgroundColor: CupertinoColors.systemGrey,
+                    ),
                   ),
                 ),
               ),
