@@ -46,10 +46,10 @@ class ClientItemListState extends ClientState {
   final List<Client> data;
 }
 
-class OnlineClient extends ClientState {
-  const OnlineClient();
+class OnlineClientState extends ClientState {
+  const OnlineClientState();
 }
 
-class OfflineClient extends ClientState {
-  const OfflineClient();
+class OfflineClientState extends ClientState {
+  const OfflineClientState();
 }

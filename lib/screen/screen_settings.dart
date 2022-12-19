@@ -38,8 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 height: 60.0,
                 title: Text(localizations.notifications.capitalize()),
                 trailing: CupertinoSwitch(
-                  value: true,
                   onChanged: (value) {},
+                  value: true,
                 ),
                 onTap: () {},
               ),
@@ -72,9 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const Icon(CupertinoIcons.forward, color: CupertinoColors.systemFill),
                     ],
                   ),
-                  onTap: () {
-                    context.pushNamed(SettingsLanguageScreen.name);
-                  },
+                  onTap: () => context.pushNamed(SettingsLanguageScreen.name),
                 );
               }),
             ),
@@ -87,11 +85,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   const Divider(indent: 16.0, endIndent: 16.0),
                   CupertinoButton(
+                    onPressed: () {},
                     child: Text(
                       localizations.logout.capitalize(),
                       style: const TextStyle(color: CupertinoColors.destructiveRed),
                     ),
-                    onPressed: () {},
                   ),
                 ],
               ),

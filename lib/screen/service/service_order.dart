@@ -40,9 +40,6 @@ class SubscribeToOrder extends OrderEvent {
     final firebaseMessaging = FirebaseService.firebaseMessaging;
     // await firebaseMessaging.requestPermission();
 
-    final clientService = ClientService();
-    await clientService.handle(const SetClientStatus(status: ClientStatus.online));
-
     await firebaseMessaging.subscribeToTopic(_onlineUserTopic);
 
     /// Handle subscription
@@ -63,7 +60,6 @@ class SubscribeToOrder extends OrderEvent {
             subscription.cancel(),
             subscriptionOpenedApp.cancel(),
             firebaseMessaging.unsubscribeFromTopic(_onlineUserTopic),
-            clientService.handle(const SetClientStatus(status: ClientStatus.offline)),
           ]);
           service.value = const InitOrderState();
         },
@@ -81,7 +77,6 @@ class QueryOrderList extends OrderEvent {
   Future<void> _execute(OrderService service) async {
     final client = ClientService.authenticated!;
     final token = client.accessToken;
-    service.value = const PendingOrderState();
     try {
       final response = await Dio().getUri<String>(
         Uri.parse(_url),

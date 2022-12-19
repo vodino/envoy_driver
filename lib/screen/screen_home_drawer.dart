@@ -52,9 +52,9 @@ class HomeDrawer extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: CustomListTile(
+                onTap: () => context.pushNamed(OrderProfitScreen.name),
                 leading: const Icon(CupertinoIcons.tickets),
                 title: const Text('Gains'),
-                onTap: () {},
               ),
             ),
             SliverToBoxAdapter(

@@ -4,29 +4,27 @@ import 'package:shimmer/shimmer.dart';
 
 import '_widget.dart';
 
-class OrderRecordingAppBar extends DefaultAppBar {
-  const OrderRecordingAppBar({super.key});
+class OrderProfitAppBar extends DefaultAppBar {
+  const OrderProfitAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const CupertinoNavigationBar(
-      middle: Text('Commandes'),
+      middle: Text('Gains'),
       transitionBetweenRoutes: false,
     );
   }
 }
 
-class OrderRecordingTab extends StatelessWidget {
-  const OrderRecordingTab({
+class OrderProfitTab extends StatelessWidget {
+  const OrderProfitTab({
     super.key,
-    required this.counter,
     required this.label,
     this.active = false,
     this.onPressed,
   });
 
   final VoidCallback? onPressed;
-  final int counter;
   final String label;
   final bool active;
 
@@ -44,22 +42,12 @@ class OrderRecordingTab extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: IconTheme(
             data: IconThemeData(color: foregroundColor),
             child: DefaultTextStyle(
               style: TextStyle(color: foregroundColor),
-              child: Tab(
-                icon: FittedBox(child: Text(label)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(CupertinoIcons.cube_box, size: 30.0),
-                    const SizedBox(width: 8.0),
-                    Text(counter.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 30.0)),
-                  ],
-                ),
-              ),
+              child: Tab(icon: FittedBox(child: Text(label))),
             ),
           ),
         ),
@@ -68,8 +56,45 @@ class OrderRecordingTab extends StatelessWidget {
   }
 }
 
-class OrderRecordingShimmer extends StatelessWidget {
-  const OrderRecordingShimmer({super.key});
+class OrderProfitCard extends StatelessWidget {
+  const OrderProfitCard({
+    super.key,
+    required this.title,
+    required this.content,
+  });
+
+  final String title;
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 3.5,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          color: CupertinoColors.systemFill,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: context.theme.textTheme.caption),
+            const SizedBox(height: 4.0),
+            Text(
+              content,
+              style: context.cupertinoTheme.textTheme.navLargeTitleTextStyle.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OrderProfitShimmer extends StatelessWidget {
+  const OrderProfitShimmer({super.key});
 
   Widget _tile() {
     return Padding(
@@ -127,21 +152,13 @@ class OrderRecordingShimmer extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Row(
-              children: List.filled(
-                2,
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 40.0),
-                    margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                    decoration: BoxDecoration(
-                      color: CupertinoColors.white,
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                  ),
-                ),
+          AspectRatio(
+            aspectRatio: 3.5,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16.0),
+              decoration: BoxDecoration(
+                color: CupertinoColors.white,
+                borderRadius: BorderRadius.circular(12.0),
               ),
             ),
           ),

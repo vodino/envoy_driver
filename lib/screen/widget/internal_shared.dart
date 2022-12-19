@@ -268,7 +268,6 @@ class CustomLocationTile extends StatelessWidget {
   }
 }
 
-
 class CustomTextFieldModal extends StatefulWidget {
   const CustomTextFieldModal({
     super.key,
@@ -356,7 +355,6 @@ class _CustomTextFieldModalState extends State<CustomTextFieldModal> {
   }
 }
 
-
 class CustomCheckListTile extends StatelessWidget {
   const CustomCheckListTile({
     super.key,
@@ -394,6 +392,29 @@ class CustomCheckListTile extends StatelessWidget {
         ),
         side: const BorderSide(color: CupertinoColors.systemFill),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+      ),
+    );
+  }
+}
+
+class CustomErrorPage extends StatelessWidget {
+  const CustomErrorPage({
+    super.key,
+    required this.onTap,
+  });
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: const [
+          Text("Une erreur s'est produite"),
+          SizedBox(height: 12.0),
+          Text("Cliquer ici pour réessayer"),
+        ],
       ),
     );
   }

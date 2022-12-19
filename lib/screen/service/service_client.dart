@@ -145,8 +145,12 @@ class RegisterClient extends ClientEvent {
 class SetClientStatus extends ClientEvent {
   const SetClientStatus({
     required this.status,
+    required this.latitude,
+    required this.longitude,
   });
 
+  final double latitude;
+  final double longitude;
   final ClientStatus status;
 
   String get url => '${RepositoryService.httpURL}/v1/api/go/${status.value}';
@@ -157,8 +161,13 @@ class SetClientStatus extends ClientEvent {
     try {
       final client = ClientService.authenticated!;
       final token = client.accessToken;
+      final body = {
+        'lat': latitude,
+        'long': longitude,
+      };
       final response = await Dio().postUri<String>(
         Uri.parse(url),
+        data: jsonEncode(body),
         options: Options(headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -168,9 +177,9 @@ class SetClientStatus extends ClientEvent {
       switch (response.statusCode) {
         case 200:
           if (status == ClientStatus.online) {
-            service.value = const OnlineClient();
+            service.value = const OnlineClientState();
           } else {
-            service.value = const OfflineClient();
+            service.value = const OfflineClientState();
           }
           break;
         default:
@@ -233,8 +242,6 @@ class UpdateLocation extends ClientEvent {
           );
       }
     } catch (error) {
-      if (error is DioError) print(error.response?.data);
-      print(error);
       service.value = FailureClientState(
         message: error.toString(),
         event: this,

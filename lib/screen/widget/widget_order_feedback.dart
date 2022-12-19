@@ -17,8 +17,8 @@ class OrderFeedbackAppBar extends DefaultAppBar {
         onPressed: close,
         child: const Icon(CupertinoIcons.clear_circled_solid),
       ),
-      middle: const Text('Evaluation'),
       transitionBetweenRoutes: false,
+      middle: const Text('Evaluation'),
       automaticallyImplyLeading: false,
     );
   }

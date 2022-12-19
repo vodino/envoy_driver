@@ -1,7 +1,9 @@
-export 'schema_country.dart';
-export 'schema_contact.dart';
 export 'schema_client.dart';
+export 'schema_contact.dart';
+export 'schema_country.dart';
+export 'schema_earning.dart';
 export 'schema_order.dart';
 export 'schema_place.dart';
+export 'schema_purchase.dart';
 export 'schema_route.dart';
 export 'schema_routeraw.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '_screen.dart';
 
 class OrderRecordingScreen extends StatefulWidget {
@@ -19,7 +20,8 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
   /// OrderService
   late final OrderService _orderService;
 
-  Future<void> _getOrderList() {
+  Future<void> _getOrderList([bool pending = false]) {
+    if (pending) _orderService.value = const PendingOrderState();
     return _orderService.handle(const QueryOrderList());
   }
 
@@ -33,8 +35,8 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
     _indexController = ValueNotifier(0);
 
     /// OrderService
-    _orderService = OrderService.instance();
-    if (_orderService.value is! OrderItemListState) WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _getOrderList());
+    _orderService = OrderService();
+    if (_orderService.value is! OrderItemListState) WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _getOrderList(true));
   }
 
   @override
@@ -46,7 +48,7 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
         valueListenable: _orderService,
         builder: (context, state, child) {
           if (state is PendingOrderState) {
-            return const Center(child: CircularProgressIndicator.adaptive());
+            return const OrderRecordingShimmer();
           } else if (state is OrderItemListState) {
             return ValueListenableBuilder<int>(
               valueListenable: _indexController,
@@ -89,6 +91,15 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
                         ),
                       ),
                       SliverVisibility(
+                        visible: index == 0 && inProgressItems.isEmpty && scheduledItems.isEmpty,
+                        sliver: const SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: Text("Vous n'avez pas de commandes actives"),
+                          ),
+                        ),
+                      ),
+                      SliverVisibility(
                         visible: index == 0 && inProgressItems.isNotEmpty,
                         sliver: MultiSliver(
                           pushPinnedChildren: true,
@@ -121,9 +132,12 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
                                       child: const Icon(Icons.motorcycle),
                                     ),
                                     subtitle: Text('De ${item.pickupPlace?.title} à ${item.deliveryPlace?.title}'),
-                                    trailing: Text('${item.price} F'),
+                                    onTap: () => context.pushNamed(OrderContentScreen.name, extra: item),
+                                    trailing: Text(
+                                      '${item.price} F',
+                                      style: context.cupertinoTheme.textTheme.navTitleTextStyle,
+                                    ),
                                     title: Text(item.name ?? ''),
-                                    onTap: () {},
                                   );
                                 },
                                 childCount: inProgressItems.length,
@@ -159,9 +173,9 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
                                       child: const Icon(Icons.motorcycle),
                                     ),
                                     subtitle: Text('De ${item.pickupPlace?.title} à ${item.deliveryPlace?.title}'),
+                                    onTap: () => context.pushNamed(OrderContentScreen.name, extra: item),
                                     trailing: Text('${item.price} F'),
                                     title: Text(item.name ?? ''),
-                                    onTap: () {},
                                   );
                                 },
                                 childCount: scheduledItems.length,
@@ -171,26 +185,43 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
                         ),
                       ),
                       SliverVisibility(
-                        visible: index == 1 && prevItems.isNotEmpty,
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final item = prevItems[index];
-                              return CustomListTile(
-                                leading: CustomCircleAvatar(
-                                  radius: 18.0,
-                                  elevation: 0.0,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                                  child: const Icon(Icons.motorcycle),
+                        visible: index == 1,
+                        sliver: MultiSliver(
+                          children: [
+                            const SliverPinnedHeader(child: Divider()),
+                            SliverVisibility(
+                              visible: prevItems.isNotEmpty,
+                              replacementSliver: const SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: Center(
+                                  child: Text("Vous n'avez pas de commandes terminées"),
                                 ),
-                                subtitle: Text('De ${item.pickupPlace?.title} à ${item.deliveryPlace?.title}'),
-                                trailing: Text('${item.price} F'),
-                                title: Text(item.name ?? ''),
-                                onTap: () {},
-                              );
-                            },
-                            childCount: prevItems.length,
-                          ),
+                              ),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    final item = prevItems[index];
+                                    return CustomListTile(
+                                      leading: CustomCircleAvatar(
+                                        radius: 18.0,
+                                        elevation: 0.0,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                        child: const Icon(Icons.motorcycle),
+                                      ),
+                                      subtitle: Text('De ${item.pickupPlace?.title} à ${item.deliveryPlace?.title}'),
+                                      onTap: () => context.pushNamed(OrderContentScreen.name, extra: item),
+                                      trailing: Text(
+                                        '${item.price} F',
+                                        style: context.cupertinoTheme.textTheme.navTitleTextStyle,
+                                      ),
+                                      title: Text(item.name ?? ''),
+                                    );
+                                  },
+                                  childCount: prevItems.length,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -199,7 +230,7 @@ class _OrderRecordingScreenState extends State<OrderRecordingScreen> {
               },
             );
           }
-          return const SizedBox.shrink();
+          return CustomErrorPage(onTap: () => _getOrderList(true));
         },
       ),
     );

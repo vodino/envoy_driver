@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openHomeOrderList() async {
-    _clearMap();
+    await _clearMap();
 
     ///
     final popController = ValueNotifier<Order?>(null);
@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openOnlineSheet([bool subscribed = false]) async {
-    _clearMap();
+    await _clearMap();
 
     ///
     final popController = ValueNotifier<Order?>(null);
@@ -181,6 +181,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onUserLocationUpdated(UserLocation location) {
+    if (_userLocation == null) {
+      _locationService.value = LocationItemState(
+        data: LocationData.fromMap({
+          'longitude': location.position.longitude,
+          'latitude': location.position.latitude,
+        }),
+      );
+    }
     _userLocation = location;
     _goToMyPosition();
   }
@@ -237,19 +245,17 @@ class _HomeScreenState extends State<HomeScreen> {
   /// LocationService
   late final LocationService _locationService;
   StreamSubscription? _locationSubscription;
-  LocationData? _myPosition;
 
   void _getCurrentLocation() {
     _locationService.handle(const GetLocation(
       subscription: true,
-      distanceFilter: 0,
+      distanceFilter: 5,
     ));
   }
 
   void _listenLocationState(BuildContext context, LocationState state) {
     if (state is LocationItemState) {
       _locationSubscription = state.subscription;
-      _myPosition = state.data;
       _goToMyPosition();
     }
   }
@@ -402,6 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             body: ValueListenableListener(
+              initiated: true,
               listener: _listenLocationState,
               valueListenable: _locationService,
               child: AfterLayout(

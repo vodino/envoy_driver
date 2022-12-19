@@ -17,85 +17,90 @@ const OrderSchema = CollectionSchema(
   name: r'Order',
   id: 103494837486634173,
   properties: {
-    r'audioPath': PropertySchema(
+    r'amountPaidedByRider': PropertySchema(
       id: 0,
+      name: r'amountPaidedByRider',
+      type: IsarType.double,
+    ),
+    r'audioPath': PropertySchema(
+      id: 1,
       name: r'audioPath',
       type: IsarType.string,
     ),
     r'client': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'client',
       type: IsarType.object,
       target: r'Client',
     ),
     r'createdAt': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'deliveryAdditionalInfo': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'deliveryAdditionalInfo',
       type: IsarType.string,
     ),
     r'deliveryPhoneNumber': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'deliveryPhoneNumber',
       type: IsarType.object,
       target: r'Contact',
     ),
     r'deliveryPlace': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'deliveryPlace',
       type: IsarType.object,
       target: r'Place',
     ),
     r'name': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'name',
       type: IsarType.string,
     ),
     r'pickupAdditionalInfo': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'pickupAdditionalInfo',
       type: IsarType.string,
     ),
     r'pickupPhoneNumber': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'pickupPhoneNumber',
       type: IsarType.object,
       target: r'Contact',
     ),
     r'pickupPlace': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'pickupPlace',
       type: IsarType.object,
       target: r'Place',
     ),
     r'price': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'price',
       type: IsarType.double,
     ),
     r'rider': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'rider',
       type: IsarType.object,
       target: r'Client',
     ),
     r'scheduledDate': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'scheduledDate',
       type: IsarType.dateTime,
     ),
     r'status': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'status',
       type: IsarType.string,
       enumMap: _OrderstatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -205,51 +210,52 @@ void _orderSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.audioPath);
+  writer.writeDouble(offsets[0], object.amountPaidedByRider);
+  writer.writeString(offsets[1], object.audioPath);
   writer.writeObject<Client>(
-    offsets[1],
+    offsets[2],
     allOffsets,
     ClientSchema.serialize,
     object.client,
   );
-  writer.writeDateTime(offsets[2], object.createdAt);
-  writer.writeString(offsets[3], object.deliveryAdditionalInfo);
+  writer.writeDateTime(offsets[3], object.createdAt);
+  writer.writeString(offsets[4], object.deliveryAdditionalInfo);
   writer.writeObject<Contact>(
-    offsets[4],
+    offsets[5],
     allOffsets,
     ContactSchema.serialize,
     object.deliveryPhoneNumber,
   );
   writer.writeObject<Place>(
-    offsets[5],
+    offsets[6],
     allOffsets,
     PlaceSchema.serialize,
     object.deliveryPlace,
   );
-  writer.writeString(offsets[6], object.name);
-  writer.writeString(offsets[7], object.pickupAdditionalInfo);
+  writer.writeString(offsets[7], object.name);
+  writer.writeString(offsets[8], object.pickupAdditionalInfo);
   writer.writeObject<Contact>(
-    offsets[8],
+    offsets[9],
     allOffsets,
     ContactSchema.serialize,
     object.pickupPhoneNumber,
   );
   writer.writeObject<Place>(
-    offsets[9],
+    offsets[10],
     allOffsets,
     PlaceSchema.serialize,
     object.pickupPlace,
   );
-  writer.writeDouble(offsets[10], object.price);
+  writer.writeDouble(offsets[11], object.price);
   writer.writeObject<Client>(
-    offsets[11],
+    offsets[12],
     allOffsets,
     ClientSchema.serialize,
     object.rider,
   );
-  writer.writeDateTime(offsets[12], object.scheduledDate);
-  writer.writeString(offsets[13], object.status?.name);
-  writer.writeDateTime(offsets[14], object.updatedAt);
+  writer.writeDateTime(offsets[13], object.scheduledDate);
+  writer.writeString(offsets[14], object.status?.name);
+  writer.writeDateTime(offsets[15], object.updatedAt);
 }
 
 Order _orderDeserialize(
@@ -259,46 +265,47 @@ Order _orderDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Order(
-    audioPath: reader.readStringOrNull(offsets[0]),
+    amountPaidedByRider: reader.readDoubleOrNull(offsets[0]),
+    audioPath: reader.readStringOrNull(offsets[1]),
     client: reader.readObjectOrNull<Client>(
-      offsets[1],
+      offsets[2],
       ClientSchema.deserialize,
       allOffsets,
     ),
-    createdAt: reader.readDateTimeOrNull(offsets[2]),
-    deliveryAdditionalInfo: reader.readStringOrNull(offsets[3]),
+    createdAt: reader.readDateTimeOrNull(offsets[3]),
+    deliveryAdditionalInfo: reader.readStringOrNull(offsets[4]),
     deliveryPhoneNumber: reader.readObjectOrNull<Contact>(
-      offsets[4],
+      offsets[5],
       ContactSchema.deserialize,
       allOffsets,
     ),
     deliveryPlace: reader.readObjectOrNull<Place>(
-      offsets[5],
+      offsets[6],
       PlaceSchema.deserialize,
       allOffsets,
     ),
     id: id,
-    name: reader.readStringOrNull(offsets[6]),
-    pickupAdditionalInfo: reader.readStringOrNull(offsets[7]),
+    name: reader.readStringOrNull(offsets[7]),
+    pickupAdditionalInfo: reader.readStringOrNull(offsets[8]),
     pickupPhoneNumber: reader.readObjectOrNull<Contact>(
-      offsets[8],
+      offsets[9],
       ContactSchema.deserialize,
       allOffsets,
     ),
     pickupPlace: reader.readObjectOrNull<Place>(
-      offsets[9],
+      offsets[10],
       PlaceSchema.deserialize,
       allOffsets,
     ),
-    price: reader.readDoubleOrNull(offsets[10]),
+    price: reader.readDoubleOrNull(offsets[11]),
     rider: reader.readObjectOrNull<Client>(
-      offsets[11],
+      offsets[12],
       ClientSchema.deserialize,
       allOffsets,
     ),
-    scheduledDate: reader.readDateTimeOrNull(offsets[12]),
-    status: _OrderstatusValueEnumMap[reader.readStringOrNull(offsets[13])],
-    updatedAt: reader.readDateTimeOrNull(offsets[14]),
+    scheduledDate: reader.readDateTimeOrNull(offsets[13]),
+    status: _OrderstatusValueEnumMap[reader.readStringOrNull(offsets[14])],
+    updatedAt: reader.readDateTimeOrNull(offsets[15]),
   );
   return object;
 }
@@ -311,58 +318,60 @@ P _orderDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 1:
+      return (reader.readStringOrNull(offset)) as P;
+    case 2:
       return (reader.readObjectOrNull<Client>(
         offset,
         ClientSchema.deserialize,
         allOffsets,
       )) as P;
-    case 2:
-      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
+      return (reader.readStringOrNull(offset)) as P;
+    case 5:
       return (reader.readObjectOrNull<Contact>(
         offset,
         ContactSchema.deserialize,
-        allOffsets,
-      )) as P;
-    case 5:
-      return (reader.readObjectOrNull<Place>(
-        offset,
-        PlaceSchema.deserialize,
         allOffsets,
       )) as P;
     case 6:
-      return (reader.readStringOrNull(offset)) as P;
-    case 7:
-      return (reader.readStringOrNull(offset)) as P;
-    case 8:
-      return (reader.readObjectOrNull<Contact>(
-        offset,
-        ContactSchema.deserialize,
-        allOffsets,
-      )) as P;
-    case 9:
       return (reader.readObjectOrNull<Place>(
         offset,
         PlaceSchema.deserialize,
         allOffsets,
       )) as P;
+    case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
+      return (reader.readStringOrNull(offset)) as P;
+    case 9:
+      return (reader.readObjectOrNull<Contact>(
+        offset,
+        ContactSchema.deserialize,
+        allOffsets,
+      )) as P;
     case 10:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readObjectOrNull<Place>(
+        offset,
+        PlaceSchema.deserialize,
+        allOffsets,
+      )) as P;
     case 11:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 12:
       return (reader.readObjectOrNull<Client>(
         offset,
         ClientSchema.deserialize,
         allOffsets,
       )) as P;
-    case 12:
-      return (reader.readDateTimeOrNull(offset)) as P;
     case 13:
-      return (_OrderstatusValueEnumMap[reader.readStringOrNull(offset)]) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 14:
+      return (_OrderstatusValueEnumMap[reader.readStringOrNull(offset)]) as P;
+    case 15:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -470,6 +479,87 @@ extension OrderQueryWhere on QueryBuilder<Order, Order, QWhereClause> {
 }
 
 extension OrderQueryFilter on QueryBuilder<Order, Order, QFilterCondition> {
+  QueryBuilder<Order, Order, QAfterFilterCondition>
+      amountPaidedByRiderIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'amountPaidedByRider',
+      ));
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterFilterCondition>
+      amountPaidedByRiderIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'amountPaidedByRider',
+      ));
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterFilterCondition> amountPaidedByRiderEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'amountPaidedByRider',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterFilterCondition>
+      amountPaidedByRiderGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'amountPaidedByRider',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterFilterCondition> amountPaidedByRiderLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'amountPaidedByRider',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterFilterCondition> amountPaidedByRiderBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'amountPaidedByRider',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<Order, Order, QAfterFilterCondition> audioPathIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1714,6 +1804,18 @@ extension OrderQueryObject on QueryBuilder<Order, Order, QFilterCondition> {
 extension OrderQueryLinks on QueryBuilder<Order, Order, QFilterCondition> {}
 
 extension OrderQuerySortBy on QueryBuilder<Order, Order, QSortBy> {
+  QueryBuilder<Order, Order, QAfterSortBy> sortByAmountPaidedByRider() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'amountPaidedByRider', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterSortBy> sortByAmountPaidedByRiderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'amountPaidedByRider', Sort.desc);
+    });
+  }
+
   QueryBuilder<Order, Order, QAfterSortBy> sortByAudioPath() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'audioPath', Sort.asc);
@@ -1824,6 +1926,18 @@ extension OrderQuerySortBy on QueryBuilder<Order, Order, QSortBy> {
 }
 
 extension OrderQuerySortThenBy on QueryBuilder<Order, Order, QSortThenBy> {
+  QueryBuilder<Order, Order, QAfterSortBy> thenByAmountPaidedByRider() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'amountPaidedByRider', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Order, Order, QAfterSortBy> thenByAmountPaidedByRiderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'amountPaidedByRider', Sort.desc);
+    });
+  }
+
   QueryBuilder<Order, Order, QAfterSortBy> thenByAudioPath() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'audioPath', Sort.asc);
@@ -1946,6 +2060,12 @@ extension OrderQuerySortThenBy on QueryBuilder<Order, Order, QSortThenBy> {
 }
 
 extension OrderQueryWhereDistinct on QueryBuilder<Order, Order, QDistinct> {
+  QueryBuilder<Order, Order, QDistinct> distinctByAmountPaidedByRider() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'amountPaidedByRider');
+    });
+  }
+
   QueryBuilder<Order, Order, QDistinct> distinctByAudioPath(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2012,6 +2132,12 @@ extension OrderQueryProperty on QueryBuilder<Order, Order, QQueryProperty> {
   QueryBuilder<Order, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Order, double?, QQueryOperations> amountPaidedByRiderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'amountPaidedByRider');
     });
   }
 

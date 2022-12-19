@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 
 import '_service.dart';
@@ -9,7 +10,7 @@ class IsarService {
   static Isar get isar => _isar!;
 
   static Future<void> developement() async {
-    _isar ??= await Isar.open([OrderSchema]);
+    _isar ??= await Isar.open([OrderSchema, EarningSchema, PurchaseSchema], inspector: kDebugMode);
   }
 
   static Future<void> production() async {

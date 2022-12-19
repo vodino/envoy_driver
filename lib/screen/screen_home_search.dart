@@ -45,11 +45,9 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
   void _listenOrderState(BuildContext context, OrderState state) {
     if (state is SubscriptionOrderState) {
       _canceller = state.canceller;
-      _activeController.value = true;
     } else if (state is OrderItemState) {
       _openNewOrderModal(state.data);
     } else if (state is FailureOrderState) {
-      _activeController.value = false;
       _canceller?.call();
     }
   }
@@ -60,7 +58,6 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
 
   Future<bool> _unsubscribe() async {
     await _cancel();
-    _activeController.value = false;
     return true;
   }
 
@@ -79,19 +76,39 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
     if (state is LocationItemState) {
       _locationSubscription = state.subscription;
       _userLocation = state.data;
-      if (_activeController.value) _updateLocation(_userLocation!);
+      if (_activeController.value) _updateLocation();
     }
   }
 
   /// ClientService
   late final ClientService _clientService;
+  late final ClientService _positionClientService;
 
-  void _listenClientState(BuildContext context, ClientState state) {}
+  void _listenClientState(BuildContext context, ClientState state) {
+    if (state is OnlineClientState) {
+      _subscribe();
+      _activeController.value = true;
+    } else if (state is OfflineClientState) {
+      _unsubscribe();
+      _activeController.value = false;
+    }
+  }
 
-  void _updateLocation(LocationData position) {
-    _clientService.handle(UpdateLocation(
-      longitude: position.longitude!,
-      latitude: position.latitude!,
+  void _setClientStatus(ClientStatus status) {
+    _clientService.handle(SetClientStatus(
+      longitude: _userLocation!.longitude!,
+      latitude: _userLocation!.latitude!,
+      status: status,
+    ));
+  }
+
+  void _goOnline() => _setClientStatus(ClientStatus.online);
+  void _goOffline() => _setClientStatus(ClientStatus.offline);
+
+  void _updateLocation() {
+    _positionClientService.handle(UpdateLocation(
+      longitude: _userLocation!.longitude!,
+      latitude: _userLocation!.latitude!,
     ));
   }
 
@@ -108,6 +125,7 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
 
     /// ClientService
     _clientService = ClientService();
+    _positionClientService = ClientService();
   }
 
   @override
@@ -150,11 +168,11 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
                           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                           child: Visibility(
                             visible: active,
-                            replacement: ValueListenableBuilder<OrderState>(
-                              valueListenable: _orderService,
-                              builder: (context, orderState, child) {
-                                VoidCallback? onPressed = _subscribe;
-                                if (orderState is PendingOrderState) onPressed = null;
+                            replacement: ValueListenableBuilder<ClientState>(
+                              valueListenable: _clientService,
+                              builder: (context, state, child) {
+                                VoidCallback? onPressed = _goOnline;
+                                if (state is PendingClientState) onPressed = null;
                                 return CupertinoButton.filled(
                                   onPressed: onPressed,
                                   child: Visibility(
@@ -165,11 +183,11 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
                                 );
                               },
                             ),
-                            child: ValueListenableBuilder<OrderState>(
-                              valueListenable: _orderService,
-                              builder: (context, orderState, child) {
-                                VoidCallback? onPressed = _unsubscribe;
-                                if (orderState is PendingOrderState) onPressed = null;
+                            child: ValueListenableBuilder<ClientState>(
+                              valueListenable: _clientService,
+                              builder: (context, state, child) {
+                                VoidCallback? onPressed = _goOffline;
+                                if (state is PendingClientState) onPressed = null;
                                 return CustomOutlineButton(
                                   onPressed: onPressed,
                                   child: Visibility(

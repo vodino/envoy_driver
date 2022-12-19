@@ -67,12 +67,35 @@ class _MyAppState extends State<MyApp> {
               },
             ),
             GoRoute(
+              path: OrderContentScreen.path,
+              name: OrderContentScreen.name,
+              pageBuilder: (context, state) {
+                final order = state.extra as Order;
+                return CupertinoPage(
+                  child: CustomKeepAlive(
+                    child: OrderContentScreen(order: order),
+                  ),
+                );
+              },
+            ),
+            GoRoute(
               path: OrderRecordingScreen.path,
               name: OrderRecordingScreen.name,
               pageBuilder: (context, state) {
                 return const CupertinoPage(
                   child: CustomKeepAlive(
                     child: OrderRecordingScreen(),
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: OrderProfitScreen.path,
+              name: OrderProfitScreen.name,
+              pageBuilder: (context, state) {
+                return const CupertinoPage(
+                  child: CustomKeepAlive(
+                    child: OrderProfitScreen(),
                   ),
                 );
               },
