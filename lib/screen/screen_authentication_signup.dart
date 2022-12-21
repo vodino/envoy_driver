@@ -1,6 +1,9 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '_screen.dart';
 
@@ -25,6 +28,34 @@ class AuthSignupScreen extends StatefulWidget {
 }
 
 class _AuthSignupScreenState extends State<AuthSignupScreen> {
+  /// Customer
+  Future<void> _openAccountPhotoModal() async {
+    final result = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AccountPhotoModal(
+          onCancel: () => Navigator.pop(context),
+          onCamera: () => Navigator.pop(context, 1),
+          onGallery: () => Navigator.pop(context, 0),
+        );
+      },
+    );
+    if (result != null) {
+      if (result == 0) {
+        _openEditImage(ImageSource.gallery);
+      } else {
+        _openEditImage(ImageSource.camera);
+      }
+    }
+  }
+
+  Future<void> _openEditImage(ImageSource source) async {
+    final file = await ImagePicker().pickImage(source: source);
+    if (file != null) {
+      
+    }
+  }
+
   /// Input
   late final TextEditingController _fullNameTextController;
   late final ValueNotifier<String?> _errorController;
@@ -46,7 +77,9 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
   }
 
   void _listenClientService(BuildContext context, ClientState state) {
-    if (state is FailureClientState) {
+    if (state is ClientItemState) {
+      context.goNamed(HomeScreen.name);
+    } else if (state is FailureClientState) {
       _errorController.value = state.message;
     }
   }
@@ -80,9 +113,14 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
                 child: AspectRatio(
                   aspectRatio: 4.0,
                   child: CustomButton(
-                    onPressed: () {},
-                    child: const CircleAvatar(
-                      backgroundColor: CupertinoColors.systemGrey,
+                    onPressed: _openAccountPhotoModal,
+                    child: Badge(
+                      position: BadgePosition.bottomEnd(),
+                      badgeColor: CupertinoColors.black,
+                      badgeContent: const Icon(CupertinoIcons.pen),
+                      child: const CircleAvatar(
+                        backgroundColor: CupertinoColors.systemGrey,
+                      ),
                     ),
                   ),
                 ),

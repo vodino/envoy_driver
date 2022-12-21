@@ -116,7 +116,7 @@ class _OrderProfitScreenState extends State<OrderProfitScreen> {
                             SliverToBoxAdapter(
                               child: OrderProfitCard(
                                 content: '${amount.toString().padLeft(2, '0')} F',
-                                title: 'Montant',
+                                title: 'Total',
                               ),
                             ),
                             const SliverToBoxAdapter(child: SizedBox(height: 12.0)),

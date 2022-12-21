@@ -38,7 +38,7 @@ class SubscribeToOrder extends OrderEvent {
   Future<void> _execute(OrderService service) async {
     service.value = const PendingOrderState();
     final firebaseMessaging = FirebaseService.firebaseMessaging;
-    // await firebaseMessaging.requestPermission();
+    await firebaseMessaging.requestPermission();
 
     await firebaseMessaging.subscribeToTopic(_onlineUserTopic);
 
@@ -111,10 +111,14 @@ class ChangeOrderStatus extends OrderEvent {
   const ChangeOrderStatus({
     required this.status,
     required this.order,
+    required this.latitude,
+    required this.longitude,
   });
 
   final Order order;
   final OrderStatus status;
+  final double latitude;
+  final double longitude;
 
   String get _url => '${RepositoryService.httpURL}/v1/api/rider/deliveries/${order.id}';
 
@@ -123,7 +127,7 @@ class ChangeOrderStatus extends OrderEvent {
     service.value = const PendingOrderState();
     try {
       final client = ClientService.authenticated!;
-      final body = {'status': status.value};
+      final body = {'status': status.value, 'lat': latitude, 'long': longitude};
       final response = await Dio().postUri<String>(
         Uri.parse(_url),
         data: jsonEncode(body),

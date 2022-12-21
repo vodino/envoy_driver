@@ -74,16 +74,18 @@ class VerifyPhoneNumberAuthEvent extends AuthEvent {
   }
 }
 
-class SignInAuthEvent extends AuthEvent {
-  SignInAuthEvent({
+class SignInOrUpdateAuthEvent extends AuthEvent {
+  SignInOrUpdateAuthEvent({
     required this.verificationId,
     required this.smsCode,
+    this.update = false,
     this.credential,
   });
 
   PhoneAuthCredential? credential;
   final String verificationId;
   final String smsCode;
+  final bool update;
 
   @override
   Future<void> _execute(AuthService service) async {
@@ -93,12 +95,12 @@ class SignInAuthEvent extends AuthEvent {
         verificationId: verificationId,
         smsCode: smsCode,
       );
-      final userCredential = await firebaseAuth.signInWithCredential(
-        credential!,
-      );
-      service.value = UserSignedState(
-        user: userCredential.user!,
-      );
+      if (update) {
+        await firebaseAuth.currentUser!.updatePhoneNumber(credential!);
+      } else {
+        await firebaseAuth.signInWithCredential(credential!);
+      }
+      service.value = UserSignedState(user: firebaseAuth.currentUser!);
     } catch (error) {
       service.value = FailureAuthState(
         message: error.toString(),

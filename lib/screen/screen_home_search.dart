@@ -95,7 +95,7 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
   }
 
   void _setClientStatus(ClientStatus status) {
-    _clientService.handle(SetClientStatus(
+    _clientService.handle(UpdateClientStatus(
       longitude: _userLocation!.longitude!,
       latitude: _userLocation!.latitude!,
       status: status,
@@ -106,7 +106,7 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
   void _goOffline() => _setClientStatus(ClientStatus.offline);
 
   void _updateLocation() {
-    _positionClientService.handle(UpdateLocation(
+    _positionClientService.handle(UpdateClientLocation(
       longitude: _userLocation!.longitude!,
       latitude: _userLocation!.latitude!,
     ));

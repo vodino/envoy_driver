@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '_service.dart';
@@ -90,6 +91,68 @@ class LoginClient extends ClientEvent {
   }
 }
 
+class LogoutClient extends ClientEvent {
+  const LogoutClient();
+
+  @override
+  Future<void> _execute(ClientService service) async {
+    service.value = const PendingClientState();
+    try {
+      await IsarService.isar.writeTxn(() {
+        return Future.wait([
+          IsarService.isar.clear(),
+          HiveService.settingsBox.clear(),
+          FirebaseAuth.instance.signOut(),
+        ]);
+      });
+      service.value = const InitClientState();
+    } catch (error) {
+      service.value = FailureClientState(
+        message: error.toString(),
+        event: this,
+      );
+    }
+  }
+}
+
+class DeleteClient extends ClientEvent {
+  const DeleteClient();
+
+  String get url => '${RepositoryService.httpURL}/v1/api/client/delete';
+
+  @override
+  Future<void> _execute(ClientService service) async {
+    service.value = const PendingClientState();
+    final client = ClientService.authenticated!;
+    final token = client.accessToken;
+    try {
+      final response = await Dio().postUri<String>(
+        Uri.parse(url),
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        }),
+      );
+      switch (response.statusCode) {
+        case 200:
+          service.handle(const LogoutClient());
+          break;
+        default:
+          service.value = FailureClientState(
+            message: 'internal error',
+            event: this,
+          );
+      }
+    } catch (error) {
+      service.value = FailureClientState(
+        message: error.toString(),
+        event: this,
+      );
+    }
+  }
+}
+
 class RegisterClient extends ClientEvent {
   const RegisterClient({
     required this.phoneNumber,
@@ -142,8 +205,58 @@ class RegisterClient extends ClientEvent {
   }
 }
 
-class SetClientStatus extends ClientEvent {
-  const SetClientStatus({
+class UpdateClient extends ClientEvent {
+  const UpdateClient({
+    this.phoneNumber,
+    this.fullName,
+  });
+
+  final String? phoneNumber;
+  final String? fullName;
+
+  String get _url => '${RepositoryService.httpURL}/v1/api/rider/update';
+
+  @override
+  Future<void> _execute(ClientService service) async {
+    service.value = const PendingClientState();
+    try {
+      final client = ClientService.authenticated!;
+      final token = client.accessToken;
+      final body = {
+        'full_name': fullName,
+        'phone_number': phoneNumber,
+      }..removeWhere((key, value) => value == null);
+      final response = await Dio().postUri<String>(
+        Uri.parse(_url),
+        data: jsonEncode(body),
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        }),
+      );
+      switch (response.statusCode) {
+        case 200:
+          final data = await compute(Client.fromServerJson, response.data!);
+          await service.handle(PutClient(client: data.copyWith(accessToken: token)));
+          break;
+        default:
+          service.value = FailureClientState(
+            message: response.data!,
+            event: this,
+          );
+      }
+    } catch (error) {
+      service.value = FailureClientState(
+        message: error.toString(),
+        event: this,
+      );
+    }
+  }
+}
+
+class UpdateClientStatus extends ClientEvent {
+  const UpdateClientStatus({
     required this.status,
     required this.latitude,
     required this.longitude,
@@ -197,8 +310,8 @@ class SetClientStatus extends ClientEvent {
   }
 }
 
-class UpdateLocation extends ClientEvent {
-  const UpdateLocation({
+class UpdateClientLocation extends ClientEvent {
+  const UpdateClientLocation({
     required this.latitude,
     required this.longitude,
     this.orderId,
@@ -295,8 +408,8 @@ class PutClient extends ClientEvent {
   }
 }
 
-class DeleteClient extends ClientEvent {
-  const DeleteClient({
+class RemoveClient extends ClientEvent {
+  const RemoveClient({
     required this.client,
   });
 

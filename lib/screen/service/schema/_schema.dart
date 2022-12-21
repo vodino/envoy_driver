@@ -7,3 +7,4 @@ export 'schema_place.dart';
 export 'schema_purchase.dart';
 export 'schema_route.dart';
 export 'schema_routeraw.dart';
+export 'schema_rubric.dart';

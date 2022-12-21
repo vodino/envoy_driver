@@ -15,6 +15,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  /// Customer
   String _language(String languageCode) {
     final localizations = context.localizations;
     switch (languageCode) {
@@ -23,6 +24,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
       default:
         return localizations.english;
     }
+  }
+
+  Future<void> _openLogoutModal() async {
+    final result = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        return SettingsLogoutModal(
+          onCancel: () => Navigator.pop(context),
+          onDelete: () => Navigator.pop(context, 1),
+          onLogout: () => Navigator.pop(context, 0),
+        );
+      },
+    );
+    if (result != null) {
+      if (result == 0) {
+        _logoutClient();
+      } else {
+        _openDeleteModal();
+      }
+    }
+  }
+
+  Future<void> _openDeleteModal() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return SettingsDeleteModal(
+          onCancelled: () => Navigator.pop(context),
+          onDeleted: () => Navigator.pop(context, true),
+        );
+      },
+    );
+    if (result != null) {
+      _deleteClient();
+    }
+  }
+
+  /// ClientService
+  late final ClientService _instanceClientService;
+  late final ClientService _clientService;
+
+  void _listenClientState(BuildContext context, ClientState state) {
+    if (state is InitClientState) {
+      Navigator.pop(context);
+      _instanceClientService.value = state;
+      context.goNamed(HomeScreen.name);
+    }
+  }
+
+  void _logoutClient() {
+    _clientService.handle(const LogoutClient());
+  }
+
+  void _deleteClient() {
+    _clientService.handle(const DeleteClient());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// ClientService
+    _clientService = ClientService();
+    _instanceClientService = ClientService.instance();
   }
 
   @override
@@ -84,12 +149,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Divider(indent: 16.0, endIndent: 16.0),
-                  CupertinoButton(
-                    onPressed: () {},
-                    child: Text(
-                      localizations.logout.capitalize(),
-                      style: const TextStyle(color: CupertinoColors.destructiveRed),
-                    ),
+                  ValueListenableConsumer<ClientState>(
+                    listener: _listenClientState,
+                    valueListenable: _clientService,
+                    builder: (context, state, child) {
+                      VoidCallback? onPressed = _openLogoutModal;
+                      if (state is PendingClientState) onPressed = null;
+                      return CupertinoButton(
+                        onPressed: onPressed,
+                        child: Visibility(
+                          visible: onPressed != null,
+                          replacement: const CupertinoActivityIndicator(),
+                          child: Text(
+                            localizations.logout.capitalize(),
+                            style: const TextStyle(color: CupertinoColors.destructiveRed),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

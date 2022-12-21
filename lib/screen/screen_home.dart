@@ -217,8 +217,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // _drawIcon(path: Assets.images.mappinBlue.path, position: route.coordinates!.last);
     // _drawIcon(path: Assets.images.mappinOrange.path, position: route.coordinates!.first);
     _mapController!.addLine(options.copyWith(LineOptions(geometry: route.coordinates)));
-    final bottom = _height * 0.2;
-    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(route.bounds!, bottom: bottom, left: 30.0, right: 30.0));
+    // final bottom = _height * 0.2;
+    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(route.bounds! // ,bottom: bottom, left: 30.0, right: 30.0
+        ));
   }
 
   Future<Symbol> _drawSymbol({required String path, required LatLng position, double? heading}) {
@@ -236,8 +237,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _clearMap() async {
     if (_mapController == null) return;
     await Future.wait([
-      if (_pickupSymbol != null) _mapController!.removeSymbol(_pickupSymbol!),
-      if (_deliverySymbol != null) _mapController!.removeSymbol(_deliverySymbol!),
+      // if (_pickupSymbol != null) _mapController!.removeSymbol(_pickupSymbol!),
+      // if (_deliverySymbol != null) _mapController!.removeSymbol(_deliverySymbol!),
+      _mapController!.clearSymbols(),
       _mapController!.clearLines(),
     ]);
   }
@@ -264,20 +266,14 @@ class _HomeScreenState extends State<HomeScreen> {
   late final RouteService _travelRouteService;
   late final RouteService _pickupRouteService;
   late final RouteService _deliveryRouteService;
-  Symbol? _pickupSymbol;
-  Symbol? _deliverySymbol;
 
   void _listenTravelRouteState(BuildContext context, RouteState state) {
     if (state is InitRouteState) {
       _clearMap();
     } else if (state is RouteItemListState) {
       final route = state.data.first;
-      _loadImage(path: Assets.images.mappinBlue.path, position: route.coordinates!.last).then((value) {
-        _pickupSymbol = value;
-      });
-      _loadImage(path: Assets.images.mappinOrange.path, position: route.coordinates!.first).then((value) {
-        _deliverySymbol = value;
-      });
+      _loadImage(path: Assets.images.mappinBlue.path, position: route.coordinates!.last);
+      _loadImage(path: Assets.images.mappinOrange.path, position: route.coordinates!.first);
       _drawLines(route: route, color: CupertinoColors.black);
     }
   }

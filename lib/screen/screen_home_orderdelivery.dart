@@ -35,6 +35,8 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
   void _deliveryOrder() {
     _orderService.handle(
       ChangeOrderStatus(
+        longitude: _userLocation!.longitude!,
+        latitude: _userLocation!.latitude!,
         status: OrderStatus.delivered,
         order: widget.order,
       ),
@@ -63,7 +65,7 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
   }
 
   void _updateLocation(LocationData position) {
-    _clientService.handle(UpdateLocation(
+    _clientService.handle(UpdateClientLocation(
       longitude: position.longitude!,
       latitude: position.latitude!,
       orderId: widget.order.id,
@@ -120,6 +122,14 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
   }
 
   @override
+  void dispose() {
+    /// LocationService
+    _locationSubscription?.cancel();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableListener<ClientState>(
       listener: _listenClientState,
@@ -156,13 +166,20 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                widget.order.deliveryAdditionalInfo!,
-                                style: context.cupertinoTheme.textTheme.textStyle,
-                                overflow: TextOverflow.clip,
-                                softWrap: true,
+                            Visibility(
+                              visible: widget.order.deliveryAdditionalInfo != null,
+                              child: Builder(
+                                builder: (context) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      widget.order.deliveryAdditionalInfo!,
+                                      style: context.cupertinoTheme.textTheme.textStyle,
+                                      overflow: TextOverflow.clip,
+                                      softWrap: true,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             Visibility(

@@ -25,3 +25,5 @@ export 'service_purchase_state.dart';
 export 'service_purchase.dart';
 export 'service_route_state.dart';
 export 'service_route.dart';
+export 'service_rubric_state.dart';
+export 'service_rubric.dart';

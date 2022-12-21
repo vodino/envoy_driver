@@ -407,13 +407,19 @@ class CustomErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Column(
-        children: const [
-          Text("Une erreur s'est produite"),
-          SizedBox(height: 12.0),
-          Text("Cliquer ici pour réessayer"),
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(CupertinoIcons.clear_circled, size: 60.0, color: CupertinoColors.destructiveRed),
+          const SizedBox(height: 16.0),
+          Text(
+            "Une erreur s'est produite",
+            style: context.cupertinoTheme.textTheme.navTitleTextStyle,
+          ),
+          const SizedBox(height: 8.0),
+          const Text("Cliquer ici pour réessayer"),
         ],
       ),
     );

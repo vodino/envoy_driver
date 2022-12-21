@@ -13,12 +13,14 @@ class AuthVerificationScreen extends StatefulWidget {
     required this.phoneNumber,
     required this.resendToken,
     required this.timeout,
+    this.update = false,
   });
 
   final String verificationId;
   final String phoneNumber;
   final Duration timeout;
   final int? resendToken;
+  final bool update;
 
   static const String verificationIdKey = 'verificationId';
   static const String phoneNumberKey = 'phone_number';
@@ -69,10 +71,11 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
 
   void _signInUser() {
     _authService.handle(
-      SignInAuthEvent(
+      SignInOrUpdateAuthEvent(
         smsCode: _smsCodeTextController.text,
         verificationId: _verificationId,
         credential: _credential,
+        update: widget.update,
       ),
     );
   }
@@ -91,7 +94,7 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
     } else if (state is UserSignedState) {
       _smsCodeFocusNode.unfocus();
       _errorController.value = null;
-      _loginClient(phoneNumber: _phoneNumber, token: state.user.uid);
+      _loginOrUpdateClient(phoneNumber: _phoneNumber, token: state.user.uid);
     } else if (state is PendingAuthState) {
       _smsCodeFocusNode.unfocus();
       _errorController.value = null;
@@ -104,15 +107,26 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
   /// ClientService
   late final ClientService _clientService;
 
-  void _loginClient({required String phoneNumber, required String token}) {
-    _clientService.handle(LoginClient(phoneNumber: phoneNumber, token: token));
+  void _loginOrUpdateClient({required String phoneNumber, required String token}) {
+    if (widget.update) {
+      _clientService.handle(UpdateClient(phoneNumber: phoneNumber));
+    } else {
+      _clientService.handle(LoginClient(phoneNumber: phoneNumber, token: token));
+    }
   }
 
   void _listenClientService(BuildContext context, ClientState state) {
     if (state is ClientItemState) {
-      context.goNamed(HomeScreen.name);
+      if (widget.update) {
+        if (widget.update) ClientService.instance().value = state;
+        Navigator.popUntil(context, (route) {
+          return route is! CupertinoPageRoute;
+        });
+      } else {
+        context.goNamed(HomeScreen.name);
+      }
     } else if (state is NoClientItemState) {
-      context.goNamed(
+      context.replaceNamed(
         AuthSignupScreen.name,
         extra: {
           AuthSignupScreen.phoneNumberKey: state.phoneNumber,
@@ -144,7 +158,7 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
     _resendAuthService = AuthService();
 
     /// ClientService
-    _clientService = ClientService.instance();
+    _clientService = widget.update ? ClientService() : ClientService.instance();
   }
 
   @override

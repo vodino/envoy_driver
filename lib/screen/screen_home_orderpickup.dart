@@ -35,6 +35,8 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
   void _pickupOrder() {
     _orderService.handle(
       ChangeOrderStatus(
+        longitude: _userLocation!.longitude!,
+        latitude: _userLocation!.latitude!,
         status: OrderStatus.collected,
         order: widget.order,
       ),
@@ -63,7 +65,7 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
   }
 
   void _updateLocation(LocationData position) {
-    _clientService.handle(UpdateLocation(
+    _clientService.handle(UpdateClientLocation(
       longitude: position.longitude!,
       latitude: position.latitude!,
       orderId: widget.order.id,
@@ -172,11 +174,21 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text(
-                              widget.order.pickupAdditionalInfo!,
-                              style: context.cupertinoTheme.textTheme.textStyle,
-                              overflow: TextOverflow.clip,
-                              softWrap: true,
+                            Visibility(
+                              visible: widget.order.pickupAdditionalInfo != null,
+                              child: Builder(
+                                builder: (context) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      widget.order.pickupAdditionalInfo!,
+                                      style: context.cupertinoTheme.textTheme.textStyle,
+                                      overflow: TextOverflow.clip,
+                                      softWrap: true,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                             Visibility(
                               visible: widget.order.audioPath != null,
