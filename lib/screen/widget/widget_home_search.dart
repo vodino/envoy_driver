@@ -10,6 +10,7 @@ class HomeSearchAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return SizedBox(
       height: 60.0,
       child: CupertinoNavigationBar(
@@ -21,8 +22,8 @@ class HomeSearchAppBar extends StatelessWidget {
           children: [
             Visibility(
               visible: active,
-              replacement: const Text('Vous êtes actuellement hors ligne'),
-              child: const Text("En attente de nouvelles courses..."),
+              replacement: Text(localizations.youcurrentlyoffline.capitalize()),
+              child: Text("${localizations.waitingneworder.capitalize()}..."),
             ),
             const SizedBox(width: 8.0),
             Icon(

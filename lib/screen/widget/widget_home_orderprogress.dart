@@ -7,10 +7,11 @@ class HomeDeliveryAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return CupertinoNavigationBar(
+      middle: Text("${localizations.currentorder.capitalize()}..."),
       border: const Border.fromBorderSide(BorderSide.none),
       backgroundColor: context.theme.colorScheme.surface,
-      middle: const Text("Commandes en cours..."),
       automaticallyImplyLeading: false,
       transitionBetweenRoutes: false,
     );

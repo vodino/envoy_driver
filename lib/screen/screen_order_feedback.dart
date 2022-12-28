@@ -45,6 +45,7 @@ class _OrderFeedbackScreenState extends State<OrderFeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Scaffold(
       appBar: OrderFeedbackAppBar(close: _onClose),
       body: BottomAppBar(
@@ -75,7 +76,7 @@ class _OrderFeedbackScreenState extends State<OrderFeedbackScreen> {
                 ),
                 subtitle: Center(
                   child: Text(
-                    "Notez la commande du client",
+                    localizations.writedowncustomerorder.capitalize(),
                     style: context.cupertinoTheme.textTheme.textStyle,
                   ),
                 ),
@@ -101,7 +102,7 @@ class _OrderFeedbackScreenState extends State<OrderFeedbackScreen> {
             SliverToBoxAdapter(
               child: CustomTextField(
                 controller: _messageTextController,
-                hintText: 'Ecrire...',
+                hintText: '${localizations.type.capitalize()}...',
                 maxLines: 6,
                 minLines: 6,
               ),
@@ -128,7 +129,7 @@ class _OrderFeedbackScreenState extends State<OrderFeedbackScreen> {
                           child: Visibility(
                             visible: onPressed != null,
                             replacement: const CupertinoActivityIndicator(),
-                            child: const Text('Soumettre'),
+                            child: Text(localizations.submit.capitalize()),
                           ),
                         );
                       },

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '_screen.dart';
 
@@ -22,6 +23,28 @@ class HomeOrderPickupScreen extends StatefulWidget {
 }
 
 class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
+  /// Customer
+
+  Future<void> _openPhonesModal(List<String> phones) async {
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return HomeOrderPickupPhonesModal(
+          onPhone: (value) => Navigator.pop(context, value),
+          onCancel: () => Navigator.pop(context),
+          phones: phones,
+        );
+      },
+    );
+    if (value != null) {
+      _launchPhone(value);
+    }
+  }
+
+  void _launchPhone(String phone) {
+    launchUrl(Uri(scheme: 'tel', host: phone));
+  }
+
   /// OrderService
   late final OrderService _orderService;
 
@@ -60,9 +83,7 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
   /// ClientService
   late final ClientService _clientService;
 
-  void _listenClientState(BuildContext context, ClientState state) {
-    print(state);
-  }
+  void _listenClientState(BuildContext context, ClientState state) {}
 
   void _updateLocation(LocationData position) {
     _clientService.handle(UpdateClientLocation(
@@ -131,6 +152,7 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return ValueListenableListener<ClientState>(
       listener: _listenClientState,
       valueListenable: _clientService,
@@ -147,10 +169,21 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const HomeOrderPickupAppBar(),
-                HomeOrderPickupTile(
-                  color: CupertinoColors.activeBlue,
-                  title: widget.order.pickupPhoneNumber!.phones!.join(', '),
-                  onPressed: () {},
+                Builder(
+                  builder: (context) {
+                    final phones = widget.order.pickupPhoneNumber!.phones!;
+                    return HomeOrderPickupTile(
+                      color: CupertinoColors.activeBlue,
+                      title: phones.join(', '),
+                      onTap: () {
+                        if (phones.length == 1) {
+                          _launchPhone(phones.first);
+                        } else {
+                          _openPhonesModal(phones);
+                        }
+                      },
+                    );
+                  },
                 ),
                 CustomListTile(
                   leading: const Icon(
@@ -211,7 +244,7 @@ class _HomeOrderPickupScreenState extends State<HomeOrderPickupScreen> {
                       child: Visibility(
                         visible: onPressed != null,
                         replacement: const CupertinoActivityIndicator(),
-                        child: const Text("J'ai collecté"),
+                        child: Text(localizations.ipickedup.capitalize()),
                       ),
                     );
                   },

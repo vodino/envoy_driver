@@ -8,9 +8,10 @@ class HomeOrderNewAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoNavigationBar(
+    final localizations = context.localizations;
+    return CupertinoNavigationBar(
       transitionBetweenRoutes: false,
-      middle: Text('Nouvelle course'),
+      middle: Text(localizations.neworder.capitalize()),
       automaticallyImplyLeading: false,
     );
   }

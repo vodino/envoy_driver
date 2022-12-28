@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:image_editor/image_editor.dart';
+import 'package:extended_image/extended_image.dart';
 
 import '_screen.dart';
 
@@ -11,10 +11,12 @@ class ImageEditorScreen extends StatefulWidget {
     super.key,
     required this.image,
     required this.title,
+    this.shape = BoxShape.circle,
   });
 
-  final File image;
+  final String image;
   final String title;
+  final BoxShape shape;
 
   @override
   State<ImageEditorScreen> createState() => _ImageEditorScreenState();
@@ -24,10 +26,21 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   /// Customer
   late final GlobalKey<ExtendedImageEditorState> _imageEditorKey;
 
-  void _onSwitch() {}
-  void _onRotateLeft() {}
-  void _onRotateRight() {}
-  void _onRefresh() {}
+  void _onFlip() {
+    _imageEditorKey.currentState!.flip();
+  }
+
+  void _onRotateLeft() {
+    _imageEditorKey.currentState!.rotate(right: false);
+  }
+
+  void _onRotateRight() {
+    _imageEditorKey.currentState!.rotate(right: true);
+  }
+
+  void _onRefresh() {
+    _imageEditorKey.currentState!.reset();
+  }
 
   void _editImage() async {
     final state = _imageEditorKey.currentState!;
@@ -36,8 +49,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     if (action.needCrop) option.addOption(ClipOption.fromRect(state.getCropRect()!));
     if (action.hasRotateAngle) option.addOption(RotateOption(action.rotateAngle.toInt()));
     if (action.needFlip) option.addOption(FlipOption(horizontal: action.flipY, vertical: action.flipX));
+    option.outputFormat = const OutputFormat.png(88);
     final result = await ImageEditor.editImage(imageEditorOption: option, image: state.rawImageData);
-    if (mounted) Navigator.pop(context, result);
+    if (result != null && mounted) Navigator.pop(context, result);
   }
 
   @override
@@ -56,7 +70,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         title: widget.title,
       ),
       body: ExtendedImage.file(
-        widget.image,
+        File(widget.image),
         cacheRawData: true,
         fit: BoxFit.contain,
         mode: ExtendedImageMode.editor,
@@ -76,7 +90,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         onRotateRight: _onRotateRight,
         onRotateLeft: _onRotateLeft,
         onRefresh: _onRefresh,
-        onSwitch: _onSwitch,
+        onFlip: _onFlip,
       ),
     );
   }

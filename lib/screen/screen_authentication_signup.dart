@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +28,7 @@ class AuthSignupScreen extends StatefulWidget {
 
 class _AuthSignupScreenState extends State<AuthSignupScreen> {
   /// Customer
-  Future<void> _openAccountPhotoModal() async {
+  Future<Uint8List?> _openAccountPhotoModal() async {
     final result = await showDialog<int>(
       context: context,
       builder: (context) {
@@ -42,21 +41,92 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
     );
     if (result != null) {
       if (result == 0) {
-        _openEditImage(ImageSource.gallery);
+        return _openEditImage(ImageSource.gallery);
       } else {
-        _openEditImage(ImageSource.camera);
+        return _openEditImage(ImageSource.camera);
+      }
+    }
+    return null;
+  }
+
+  Future<Uint8List?> _openEditImage(ImageSource source) async {
+    final file = await ImagePicker().pickImage(source: source);
+    if (file != null && mounted) {
+      return Navigator.push<Uint8List>(
+        context,
+        CupertinoPageRoute(
+          builder: (context) {
+            final localizations = context.localizations;
+            return ImageEditorScreen(
+              title: localizations.modifyprofilephoto.capitalize(),
+              image: file.path,
+            );
+          },
+        ),
+      );
+    }
+    return null;
+  }
+
+  Future<Uint8List?> _openImageContent({
+    required Uint8List image,
+    required String title,
+  }) {
+    return Navigator.push<Uint8List>(
+      context,
+      CupertinoPageRoute(
+        builder: (context) {
+          return ImageContentScreen(image: image, title: title);
+        },
+      ),
+    );
+  }
+
+  void _openProfilePhotoModal() async {
+    final data = await _openAccountPhotoModal();
+    if (data != null) _profilePhotoController.value = data;
+  }
+
+  void _openDocumentRectoPhotoModal() async {
+    final localizations = context.localizations;
+    if (_documentRectoPhotoController.value != null) {
+      final data = await _openImageContent(
+        image: _documentRectoPhotoController.value!,
+        title: localizations.rectodocument.capitalize(),
+      );
+      if (data != null) _documentRectoPhotoController.value = data;
+    } else {
+      final data = await _openAccountPhotoModal();
+      if (data != null) {
+        _documentRectoPhotoController.value = data;
+        _documentRectoTextController.text = localizations.rectocompleted.capitalize();
       }
     }
   }
 
-  Future<void> _openEditImage(ImageSource source) async {
-    final file = await ImagePicker().pickImage(source: source);
-    if (file != null) {
-      
+  void _openDocumentVersoPhotoModal() async {
+    final localizations = context.localizations;
+    if (_documentVersoPhotoController.value != null) {
+      final data = await _openImageContent(
+        image: _documentVersoPhotoController.value!,
+        title: localizations.versodocument.capitalize(),
+      );
+      if (data != null) _documentVersoPhotoController.value = data;
+    } else {
+      final data = await _openAccountPhotoModal();
+      if (data != null) {
+        _documentVersoPhotoController.value = data;
+        _documentVersoTextController.text = localizations.versocompleted.capitalize();
+      }
     }
   }
 
   /// Input
+  late final ValueNotifier<Uint8List?> _documentRectoPhotoController;
+  late final TextEditingController _documentRectoTextController;
+  late final ValueNotifier<Uint8List?> _documentVersoPhotoController;
+  late final TextEditingController _documentVersoTextController;
+  late final ValueNotifier<Uint8List?> _profilePhotoController;
   late final TextEditingController _fullNameTextController;
   late final ValueNotifier<String?> _errorController;
   late final FocusNode _fullNameFocusNode;
@@ -70,9 +140,12 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
 
   void _registerClient() {
     _clientService.handle(RegisterClient(
+      documentRecto: _documentRectoPhotoController.value,
+      documentVerso: _documentVersoPhotoController.value,
       fullName: _fullNameTextController.text.trim(),
+      avatar: _profilePhotoController.value!,
       phoneNumber: widget.phoneNumber,
-      token: widget.token,
+      firebaseToken: widget.token,
     ));
   }
 
@@ -91,7 +164,12 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
     /// Input
     _fullNameFocusNode = FocusNode();
     _errorController = ValueNotifier(null);
+    _profilePhotoController = ValueNotifier(null);
     _fullNameTextController = TextEditingController();
+    _documentRectoPhotoController = ValueNotifier(null);
+    _documentRectoTextController = TextEditingController();
+    _documentVersoPhotoController = ValueNotifier(null);
+    _documentVersoTextController = TextEditingController();
 
     /// ClientService
     _clientService = ClientService.instance();
@@ -99,6 +177,7 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Scaffold(
       appBar: const AuthSignupAppBar(),
       body: BottomAppBar(
@@ -107,21 +186,27 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
         child: CustomScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           slivers: [
+            SliverPinnedHeader.builder((context, overlap) {
+              return Visibility(
+                visible: overlap,
+                child: const Divider(),
+              );
+            }),
             SliverPadding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               sliver: SliverToBoxAdapter(
                 child: AspectRatio(
                   aspectRatio: 4.0,
-                  child: CustomButton(
-                    onPressed: _openAccountPhotoModal,
-                    child: Badge(
-                      position: BadgePosition.bottomEnd(),
-                      badgeColor: CupertinoColors.black,
-                      badgeContent: const Icon(CupertinoIcons.pen),
-                      child: const CircleAvatar(
-                        backgroundColor: CupertinoColors.systemGrey,
-                      ),
-                    ),
+                  child: ValueListenableBuilder<Uint8List?>(
+                    valueListenable: _profilePhotoController,
+                    builder: (context, file, child) {
+                      return CustomButton(
+                        onPressed: _openProfilePhotoModal,
+                        child: AuthSignupProfilAvatar(
+                          foregroundImage: file != null ? MemoryImage(file) : null,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -134,6 +219,33 @@ class _AuthSignupScreenState extends State<AuthSignupScreen> {
               child: AuthSignupFullNameTextField(
                 controller: _fullNameTextController,
                 focusNode: _fullNameFocusNode,
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12.0)),
+            const SliverToBoxAdapter(child: AuthSignupDocumentLabel()),
+            SliverToBoxAdapter(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AuthSignupDocumentTextField(
+                      hintText: localizations.recto.capitalize(),
+                      controller: _documentRectoTextController,
+                      onTap: _openDocumentRectoPhotoModal,
+                    ),
+                  ),
+                  Expanded(
+                    child: ValueListenableBuilder<Uint8List?>(
+                      valueListenable: _documentVersoPhotoController,
+                      builder: (context, file, child) {
+                        return AuthSignupDocumentTextField(
+                          hintText: localizations.verso.capitalize(),
+                          controller: _documentVersoTextController,
+                          onTap: _openDocumentVersoPhotoModal,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 16.0)),

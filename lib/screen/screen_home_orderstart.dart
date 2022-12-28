@@ -98,6 +98,7 @@ class _HomeOrderStartScreenState extends State<HomeOrderStartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return ValueListenableListener<LocationState>(
       initiated: true,
       listener: _listenLocationState,
@@ -133,12 +134,12 @@ class _HomeOrderStartScreenState extends State<HomeOrderStartScreen> {
                     const SizedBox(height: 8.0),
                     const Divider(thickness: 8.0, height: 12.0),
                     CustomListTile(
-                      title: const Text('Revenu :'),
+                      title: Text('${localizations.revenue.capitalize()} :'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            "${widget.order.price} FCFA",
+                            "${widget.order.price} F",
                             style: context.cupertinoTheme.textTheme.navTitleTextStyle.copyWith(
                               fontWeight: FontWeight.bold,
                               letterSpacing: -1.0,
@@ -150,7 +151,7 @@ class _HomeOrderStartScreenState extends State<HomeOrderStartScreen> {
                       ),
                     ),
                     CustomListTile(
-                      title: const Text('Distance :'),
+                      title: Text('${localizations.distance.capitalize()} :'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -180,7 +181,7 @@ class _HomeOrderStartScreenState extends State<HomeOrderStartScreen> {
                       builder: (context, state, child) {
                         VoidCallback? onPressed = _startOrder;
                         if (state is PendingOrderState) onPressed = null;
-                        if (duration.inSeconds != 0) onPressed = null;
+                        if (duration > Duration.zero) onPressed = null;
                         final style = TextStyle(color: onPressed == null ? CupertinoColors.systemGrey2 : null);
                         Jiffy.locale(window.locale.languageCode);
                         final jiffy = Jiffy({"year": widget.order.scheduledDate?.year, "month": widget.order.scheduledDate?.month, "day": widget.order.scheduledDate?.day, "hour": widget.order.scheduledDate?.hour, "minute": widget.order.scheduledDate?.minute});
@@ -192,7 +193,7 @@ class _HomeOrderStartScreenState extends State<HomeOrderStartScreen> {
                             child: Visibility(
                               visible: state is! PendingOrderState,
                               replacement: const CupertinoActivityIndicator(),
-                              child: Text('Commencer${duration != Duration.zero ? ' ${jiffy.fromNow()}' : ''}', style: style),
+                              child: Text('${localizations.start.capitalize()}${duration > Duration.zero ? ' ${jiffy.fromNow()}' : ''}', style: style),
                             ),
                           ),
                         );

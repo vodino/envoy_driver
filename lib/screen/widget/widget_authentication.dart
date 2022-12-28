@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '_widget.dart';
@@ -9,6 +10,7 @@ class AuthAppBar extends DefaultAppBar {
   Widget build(BuildContext context) {
     return const CupertinoNavigationBar(
       border: Border.fromBorderSide(BorderSide.none),
+      transitionBetweenRoutes: false,
     );
   }
 }
@@ -30,15 +32,17 @@ class AuthTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Center(
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: IntrinsicWidth(
-          child: CustomListTile(
-            title: Text(
-              'Saisissez les informations du compte',
-              style: context.cupertinoTheme.textTheme.navTitleTextStyle,
-            ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: CustomListTile(
+          title: Text(
+            localizations.authenticatephonenumberbysms.capitalize(),
+            style: context.cupertinoTheme.textTheme.navTitleTextStyle,
+            overflow: TextOverflow.visible,
+            textAlign: TextAlign.center,
+            softWrap: true,
           ),
         ),
       ),
@@ -58,15 +62,16 @@ class AuthDialCodeInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Container(
       width: 100.0,
       padding: const EdgeInsets.only(left: 12.0),
       child: Column(
         children: [
-          const CustomListTile(
+          CustomListTile(
             height: 30.0,
-            title: Text('Indicatif'),
-            contentPadding: EdgeInsets.symmetric(horizontal: 6.0),
+            title: Text(localizations.dialcode.capitalize()),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 6.0),
           ),
           CustomButton(
             onPressed: onPressed,
@@ -100,18 +105,19 @@ class AuthPhoneTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Column(
       children: [
-        const CustomListTile(
+        CustomListTile(
           height: 30.0,
-          title: Text('Numéro de téléphone'),
+          title: Text(localizations.phonenumber.capitalize()),
         ),
         CustomTextField(
           enabled: enabled,
           focusNode: focusNode,
           controller: controller,
-          hintText: 'numéro de téléphone',
           keyboardType: TextInputType.phone,
+          hintText: localizations.phonenumber,
         ),
       ],
     );
@@ -123,20 +129,39 @@ class AuthPrivacyInput extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.onTermsofuseTaped,
+    this.onPrivacypoliciesTaped,
   });
 
   final bool value;
   final ValueChanged<bool?>? onChanged;
+  final VoidCallback? onTermsofuseTaped;
+  final VoidCallback? onPrivacypoliciesTaped;
 
   @override
   Widget build(BuildContext context) {
-    return CheckboxListTile(
-      value: value,
-      onChanged: onChanged,
-      activeColor: CupertinoColors.activeGreen,
-      controlAffinity: ListTileControlAffinity.leading,
-      subtitle: const Text(
-        "En continuant, vous acceptez les conditions d'utilisation et consentez aux informations personnelles conformes aux Politiques de confidentialité",
+    final localizations = context.localizations;
+    return ListTile(
+      leading: Checkbox(
+        value: value,
+        onChanged: onChanged,
+        activeColor: CupertinoColors.activeGreen,
+      ),
+      subtitle: Text.rich(
+        TextSpan(children: [
+          TextSpan(text: '${localizations.acceptthe.capitalize()} '),
+          TextSpan(
+            text: localizations.termsofuse.capitalize(),
+            style: const TextStyle(color: CupertinoColors.activeBlue),
+            recognizer: TapGestureRecognizer()..onTap = onTermsofuseTaped,
+          ),
+          TextSpan(text: ' ${localizations.theuseofpersonalinformation} '),
+          TextSpan(
+            text: localizations.privacypolicies.capitalize(),
+            style: const TextStyle(color: CupertinoColors.activeBlue),
+            recognizer: TapGestureRecognizer()..onTap = onPrivacypoliciesTaped,
+          ),
+        ]),
         overflow: TextOverflow.visible,
         softWrap: true,
       ),

@@ -12,13 +12,14 @@ class OrderFeedbackAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return CupertinoNavigationBar(
       trailing: CustomButton(
         onPressed: close,
         child: const Icon(CupertinoIcons.clear_circled_solid),
       ),
       transitionBetweenRoutes: false,
-      middle: const Text('Evaluation'),
+      middle: Text(localizations.evaluation.capitalize()),
       automaticallyImplyLeading: false,
     );
   }

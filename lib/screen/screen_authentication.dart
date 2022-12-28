@@ -36,16 +36,17 @@ class _AuthScreenState extends State<AuthScreen> {
   late final AuthService _authService;
 
   void _verifyPhoneNumber() {
+    final localizations = context.localizations;
     if (_phoneTextController.text.trim().isEmpty) {
-      _errorController.value = 'Numéro de téléphone est requis.';
+      _errorController.value = localizations.phonenumberrequired.capitalize();
       return;
     }
     if (_currentCountry == null) {
-      _errorController.value = 'Indicatif est requis.';
+      _errorController.value = localizations.dialcoderequired.capitalize();
       return;
     }
     if (!_privacyController.value) {
-      _errorController.value = "Veuillez accepter les conditions d'utilistaion.";
+      _errorController.value = localizations.readandacceptterms.capitalize();
       return;
     }
     _authService.handle(

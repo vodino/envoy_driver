@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -96,49 +95,6 @@ class HomeFloatingActionButton extends StatelessWidget {
       heroTag: UniqueKey(),
       elevation: 0.8,
       child: child,
-    );
-  }
-}
-
-class HomeSheetOffline extends StatelessWidget {
-  const HomeSheetOffline({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CupertinoNavigationBar(
-          transitionBetweenRoutes: false,
-          automaticallyImplyLeading: false,
-          border: const Border.fromBorderSide(BorderSide.none),
-          middle: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text('Vous êtes actuellement hors ligne'),
-              SizedBox(width: 8.0),
-              Icon(CupertinoIcons.circle_fill, color: CupertinoColors.destructiveRed, size: 12.0),
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(24.0),
-          child: const CircleAvatar(
-            radius: 45.0,
-            foregroundColor: CupertinoColors.systemGrey,
-            backgroundColor: CupertinoColors.systemFill,
-            child: Icon(CupertinoIcons.wifi_slash, size: 50.0),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CupertinoButton.filled(
-            child: const Text('Se mettre en ligne'),
-            onPressed: () {},
-          ),
-        ),
-      ],
     );
   }
 }

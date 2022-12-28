@@ -126,12 +126,16 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
         context.goNamed(HomeScreen.name);
       }
     } else if (state is NoClientItemState) {
-      context.replaceNamed(
-        AuthSignupScreen.name,
-        extra: {
-          AuthSignupScreen.phoneNumberKey: state.phoneNumber,
-          AuthSignupScreen.tokenKey: state.token,
-        },
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(
+          builder: (context) {
+            return AuthSignupScreen(
+              phoneNumber: state.phoneNumber!,
+              token: state.token!,
+            );
+          },
+        ),
       );
     } else if (state is FailureClientState) {
       _errorController.value = state.message;
@@ -163,6 +167,7 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Scaffold(
       appBar: const AuthVerificationAppBar(),
       body: BottomAppBar(
@@ -203,8 +208,7 @@ class _AuthVerificationScreenState extends State<AuthVerificationScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Renvoyer le code'
-                                '${active ? '' : ' dans ${seconds.padLeft(2, '0')}s'}',
+                                '${localizations.resendcode.capitalize()}${active ? '' : ' ${localizations.inside} ${seconds.padLeft(2, '0')}s'}',
                                 style: active && !pending ? const TextStyle(color: CupertinoColors.activeBlue) : null,
                               ),
                               Visibility(

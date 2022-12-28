@@ -58,7 +58,6 @@ class QueryPurchaseList extends PurchaseEvent {
           );
       }
     } catch (error) {
-      print(error);
       service.value = FailurePurchaseState(
         message: error.toString(),
         event: this,

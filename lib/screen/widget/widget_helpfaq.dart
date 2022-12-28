@@ -9,8 +9,9 @@ class HelpFaqAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoNavigationBar(
-      middle: Text('Aide/Faq'),
+    final localizations = context.localizations;
+    return CupertinoNavigationBar(
+      middle: Text(localizations.faq.capitalize()),
     );
   }
 }

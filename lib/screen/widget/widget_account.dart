@@ -7,8 +7,10 @@ class AccountAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoNavigationBar(
-      middle: Text('Profil'),
+    final localizations = context.localizations;
+    return CupertinoNavigationBar(
+      transitionBetweenRoutes: false,
+      middle: Text(localizations.profile.capitalize()),
     );
   }
 }
@@ -27,23 +29,24 @@ class AccountPhotoModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return CupertinoAlertDialog(
-      content: const Text("Selectionner l'option pour obtenir une image."),
+      content: Text(localizations.selectoptionimage.capitalize()),
       actions: [
         CupertinoDialogAction(
           onPressed: onCamera,
           isDefaultAction: true,
-          child: const Text('Ouvrir la camera'),
+          child: Text(localizations.opencamera.capitalize()),
         ),
         CupertinoDialogAction(
           onPressed: onGallery,
           isDefaultAction: true,
-          child: const Text('Ouvrir la gallerie'),
+          child: Text(localizations.opengallery.capitalize()),
         ),
         CupertinoDialogAction(
           onPressed: onCancel,
           isDestructiveAction: true,
-          child: const Text('Annuler'),
+          child: Text(localizations.cancel.capitalize()),
         ),
       ],
     );

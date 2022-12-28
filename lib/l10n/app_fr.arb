@@ -13,5 +13,133 @@
     "notifications": "notifications",
     "language": "langue",
     "selectlanguage": "selectionner une langue",
-    "logout": "deconnexion"
+    "logout": "deconnexion",
+
+    "fullname": "nom complet",
+    "modifyfullname": "modifier le nom complet",
+    "phonenumber": "numéro de téléphone",
+    "modifyprofilephoto": "modifier la photo de profil",
+    "modifyphonenumber": "modifier le numéro de téléphone",
+    "selectcountry": "selectionner un pays",
+    "selectoptionimage": "selectionner une option pour obtenir une image",
+    "opencamera": "ouvrir la camera",
+    "opengallery": "ouvrir la galerie",
+
+    "cancel": "annuler",
+    "finished": "terminé",
+    "fieldcannotbeempty": "ce champ ne peut être vide",
+    "errorhasoccurred": "une erreur s'est produite",
+    "clicktry": "cliquer ici pour réessayer",
+
+    "accountinfo": "informations du compte",
+    "enteraccountinfo": "saisissez les informations du compte",
+    "documentcniorpassport": "document (cni ou passeport)",
+    "rectodocument": "document recto",
+    "versodocument": "document verso",
+    "recto": "recto",
+    "verso": "verso",
+    "rectocompleted": "recto (complété)",
+    "versocompleted": "verso (complété)",
+
+    "authenticatephonenumberbysms": "authentifiez votre numéro de téléphone par sms",
+    "codecheck": "verification de code",
+    "entercodereceivedphonenumber": "entrez le code reçu au numéro de téléphone",
+    "resendcode": "renvoyer le code",
+    "inside": "dans",
+    "dialcode": "indicatif",
+    "acceptthe": "accepter les",
+    "termsofuse": "conditions d'utilisation",
+    "theuseofpersonalinformation": "et l'usage de vos informations personnelles conformes aux",
+    "privacypolicies": "politiques de confidentialité",
+    "phonenumberrequired": "numéro de téléphone est requis",
+    "dialcoderequired": "indicatif est requis",
+    "readandacceptterms": "veuillez lire et accepter les termes du contrat",
+    
+    "availablity": "disponibilité",
+
+    "orderdelivery": "livraison de commande",
+    "idelivered": "j'ai livré",
+
+    "neworder": "nouvelle commande",
+    "youare": "vous avez",
+    "second": "seconde",
+    "refuse": "refuser",
+    "accept": "accepter",
+
+    "orderpickup": "collecte de commande",
+    "ipickedup": "j'ai collecté",
+    "selectphonenumbercall": "selectionner un numéro de téléphone à appeler",
+
+    "currentorder": "commande en cours",
+
+    "startoforder": "début de commande",
+    "revenue": "revenu",
+    "distance": "distance",
+    "start": "commencer",
+
+    "youcurrentlyoffline": "vous êtes actuellement hors ligne",
+    "waitingneworder": "en attente de nouvelles commandes",
+    "getonline": "se mettre en ligne",
+    "stop": "arrêter",
+    "edit": "modifier",
+
+    "flip": "retourner",
+    "rotateleft": "tourner à gauche",
+    "rotateright": "tourner à droite",
+    "reset": "réinitialiser",
+
+    "order": "commande",
+
+    "createdate": "créée le {date} à {time}", 
+    "@createdate": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "2020/02/02"
+            },
+            "time": {
+                "type": "String",
+                "example": "02:20"
+            }
+        }
+    },
+    "moreinfo": "plus d'infos",
+    "deliveryprice": "prix de la livraison",
+    "orderstatus": "niveau de la commande",
+    "acceptedcourier": "acceptée par un coursier",
+    "beingcollected": "en cours de collecte",
+    "beingdelivered": "en cours de livraison",
+    "deliveredcompleted": "livrée et terminée",
+    "client": "client",
+    "contactpickup": "contact pour la collecte",
+    "contactdelivery": "contact pour la livraison",
+    "purchasecourier": "achat par le coursier",
+
+    "fromto": "de {from} à {to}", 
+    "@fromto": {
+        "placeholders": {
+            "from": {
+                "type": "String",
+                "example": "2020/02/02"
+            },
+            "to": {
+                "type": "String",
+                "example": "02:20"
+            }
+        }
+    },
+    "close": "fermer",
+    "evaluation": "évaluation",
+    "writedowncustomerorder": "notez la commande du client",
+    "type": "taper",
+    "submit": "soumettre",
+    "earning": "gain",
+    "token": "token",
+
+    "activeorder": "commande active",
+    "scheduledorder": "commande programmée",
+    "completedorder": "commande terminée",
+    "noactiveorder": "vous n'avez pas de commandes actives",
+    "nocompletedorder": "vous n'avez pas de commandes terminées",
+    "systemlanguage": "langage système"
 }

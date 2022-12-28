@@ -69,15 +69,33 @@ class SubscribeToOrder extends OrderEvent {
 }
 
 class QueryOrderList extends OrderEvent {
-  const QueryOrderList();
+  const QueryOrderList({
+    this.search,
+    this.limit = 30,
+    this.offset = 0,
+    this.isNullStatus,
+    this.equalStatus,
+    this.notEqualStatus,
+    this.subscription = false,
+    this.fireImmediately = true,
+  });
+
+  final int limit;
+  final int offset;
+  final String? search;
+  final bool? isNullStatus;
+  final bool fireImmediately;
+  final OrderStatus? equalStatus;
+  final OrderStatus? notEqualStatus;
+  final bool subscription;
 
   String get _url => '${RepositoryService.httpURL}/v1/api/rider/deliveries';
 
   @override
   Future<void> _execute(OrderService service) async {
-    final client = ClientService.authenticated!;
-    final token = client.accessToken;
     try {
+      final client = ClientService.authenticated!;
+      final token = client.accessToken;
       final response = await Dio().getUri<String>(
         Uri.parse(_url),
         options: Options(headers: {
@@ -90,7 +108,16 @@ class QueryOrderList extends OrderEvent {
         case 200:
           final data = await compute(Order.fromServerListJson, response.data!);
           await OrderService().handle(PutOrderList(data: data));
-          service.value = OrderItemListState(data: data);
+          service.handle(GetOrderList(
+            limit: limit,
+            offset: offset,
+            search: search,
+            equalStatus: equalStatus,
+            isNullStatus: isNullStatus,
+            subscription: subscription,
+            notEqualStatus: notEqualStatus,
+            fireImmediately: fireImmediately,
+          ));
           break;
         default:
           service.value = FailureOrderState(
@@ -160,43 +187,65 @@ class ChangeOrderStatus extends OrderEvent {
 
 class GetOrderList extends OrderEvent {
   const GetOrderList({
-    this.subscription = false,
+    this.search,
     this.limit = 30,
     this.offset = 0,
-    this.isNullStatus = false,
+    this.isNullStatus,
     this.equalStatus,
     this.notEqualStatus,
-    this.sort = Sort.asc,
+    this.subscription = false,
+    this.fireImmediately = true,
   });
 
-  final Sort sort;
   final int limit;
   final int offset;
-  final bool isNullStatus;
+  final String? search;
+  final bool? isNullStatus;
+  final bool fireImmediately;
   final OrderStatus? equalStatus;
   final OrderStatus? notEqualStatus;
-
   final bool subscription;
 
   @override
   Future<void> _execute(OrderService service) async {
     service.value = const PendingOrderState();
     try {
-      var query = IsarService.isar.orders.where(sort: sort).filter().idIsNotNull();
-      if (isNullStatus) {
-        query = query.statusIsNull();
-      } else {
-        query = query.statusIsNotNull();
+      var query = IsarService.isar.orders.filter().idIsNotNull();
+      if (isNullStatus != null) {
+        if (isNullStatus!) {
+          query = query.statusIsNull();
+        } else {
+          query = query.statusIsNotNull();
+        }
       }
       if (equalStatus != null) query = query.statusEqualTo(equalStatus);
       if (notEqualStatus != null) query = query.not().statusEqualTo(notEqualStatus);
 
+      if (search != null) {
+        query = query
+            .priceEqualTo(double.tryParse(search!))
+            .or()
+            .nameContains(search!, caseSensitive: false)
+            .or()
+            .pickupAdditionalInfoContains(search!, caseSensitive: false)
+            .or()
+            .deliveryAdditionalInfoContains(search!, caseSensitive: false)
+            .or()
+            .pickupPlace((q) => q.titleContains(search!, caseSensitive: false))
+            .or()
+            .deliveryPlace((q) => q.titleContains(search!, caseSensitive: false))
+            .or()
+            .pickupPhoneNumber((q) => q.nameContains(search!, caseSensitive: false).or().phonesElementContains(search!))
+            .or()
+            .deliveryPhoneNumber((q) => q.nameContains(search!, caseSensitive: false).or().phonesElementContains(search!));
+      }
+
       if (subscription) {
-        query.offset(offset).limit(limit).watch(fireImmediately: true).listen((data) {
+        query.sortByUpdatedAtDesc().offset(offset).limit(limit).watch(fireImmediately: fireImmediately).listen((data) {
           service.value = OrderItemListState(data: data);
         });
       } else {
-        final data = await query.offset(offset).limit(limit).findAll();
+        final data = await query.sortByUpdatedAtDesc().offset(offset).limit(limit).findAll();
         service.value = OrderItemListState(data: data);
       }
     } catch (error) {

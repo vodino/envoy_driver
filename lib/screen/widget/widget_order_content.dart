@@ -12,8 +12,9 @@ class OrderContentAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return CupertinoNavigationBar(
-      middle: const Text('Commande'),
+      middle: Text(localizations.order.capitalize()),
       transitionBetweenRoutes: false,
       trailing: CustomButton(
         onPressed: onTrailingPressed,
@@ -22,7 +23,6 @@ class OrderContentAppBar extends DefaultAppBar {
     );
   }
 }
-
 
 class OrderContentListTile extends StatelessWidget {
   const OrderContentListTile({

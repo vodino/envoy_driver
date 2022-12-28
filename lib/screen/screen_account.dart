@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '_screen.dart';
 
@@ -18,20 +20,69 @@ class _AccountScreenState extends State<AccountScreen> {
   late final TextEditingController _fullNameTextController;
   late final TextEditingController _phoneTextController;
   // late final TextEditingController _emailTextController;
+  late final ValueNotifier<String?> _avatarPhotoController;
+
+  Future<Uint8List?> _openAccountPhotoModal() async {
+    final result = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        return AccountPhotoModal(
+          onCancel: () => Navigator.pop(context),
+          onCamera: () => Navigator.pop(context, 1),
+          onGallery: () => Navigator.pop(context, 0),
+        );
+      },
+    );
+    if (result != null) {
+      if (result == 0) {
+        return _openEditImage(ImageSource.gallery);
+      } else {
+        return _openEditImage(ImageSource.camera);
+      }
+    }
+    return null;
+  }
+
+  Future<Uint8List?> _openEditImage(ImageSource source) async {
+    final file = await ImagePicker().pickImage(source: source);
+    if (file != null && mounted) {
+      return Navigator.push<Uint8List>(
+        context,
+        CupertinoPageRoute(
+          builder: (context) {
+            final localizations = context.localizations;
+            return ImageEditorScreen(
+              image: file.path,
+              title: localizations.modifyprofilephoto.capitalize(),
+            );
+          },
+        ),
+      );
+    }
+    return null;
+  }
+
+  void _openAvatarPhotoModal() async {
+    final data = await _openAccountPhotoModal();
+    if (data != null) {
+      _updateClient(avatar: data, service: _avatarClientService);
+    }
+  }
 
   Future<void> _openFullNameModal() async {
     final value = await showDialog<String>(
       context: context,
       builder: (context) {
+        final localizations = context.localizations;
         return CustomTextFieldModal(
-          hint: 'Nom Complet',
-          title: 'Modifier le nom complet',
           value: _currentClient?.fullName,
+          hint: localizations.fullname.capitalize(),
+          title: localizations.modifyfullname.capitalize(),
         );
       },
     );
     if (value != null) {
-      _updateClient(value);
+      _updateClient(fullName: value, service: _fullNameClientService);
     }
   }
 
@@ -39,10 +90,11 @@ class _AccountScreenState extends State<AccountScreen> {
     final value = await showDialog<String>(
       context: context,
       builder: (context) {
+        final localizations = context.localizations;
         return CustomTextFieldModal(
-          hint: 'Numero de téléphone',
-          title: 'Modifier le numero de téléphone',
           value: _currentClient?.phoneNumber,
+          hint: localizations.phonenumber.capitalize(),
+          title: localizations.modifyphonenumber.capitalize(),
         );
       },
     );
@@ -66,19 +118,22 @@ class _AccountScreenState extends State<AccountScreen> {
 
   /// ClientService
   late final ClientService _instanceClientService;
-  late final ClientService _clientService;
+  late final ClientService _fullNameClientService;
+  late final ClientService _avatarClientService;
 
   Client? _currentClient;
 
-  void _updateClient(String fullName) {
-    _clientService.handle(UpdateClient(
+  void _updateClient({String? fullName, Uint8List? avatar, required ClientService service}) {
+    service.handle(UpdateClient(
       fullName: fullName,
+      avatar: avatar,
     ));
   }
 
   void _listenInstanceClientState(BuildContext context, ClientState state) {
     if (state is ClientItemState) {
       _currentClient = ClientService.authenticated;
+      _avatarPhotoController.value = _currentClient!.avatar;
       _fullNameTextController.text = _currentClient!.fullName!;
       _phoneTextController.text = _currentClient!.phoneNumber!;
     }
@@ -131,11 +186,13 @@ class _AccountScreenState extends State<AccountScreen> {
     _authService = AuthService.instance();
 
     /// ClientService
-    _clientService = ClientService();
+    _avatarClientService = ClientService();
+    _fullNameClientService = ClientService();
     _instanceClientService = ClientService.instance();
     _currentClient = ClientService.authenticated!;
 
     /// Customer
+    _avatarPhotoController = ValueNotifier(_currentClient!.avatar);
     _fullNameTextController = TextEditingController(text: _currentClient!.fullName);
     _phoneTextController = TextEditingController(text: _currentClient!.phoneNumber);
     // _emailTextController = TextEditingController();
@@ -143,6 +200,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return ValueListenableListener<ClientState>(
       listener: _listenInstanceClientState,
       valueListenable: _instanceClientService,
@@ -151,13 +209,29 @@ class _AccountScreenState extends State<AccountScreen> {
         body: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(child: SizedBox(height: 16.0)),
-            const SliverPadding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               sliver: SliverToBoxAdapter(
                 child: AspectRatio(
                   aspectRatio: 4.0,
-                  child: CircleAvatar(
-                    backgroundColor: CupertinoColors.systemGrey,
+                  child: ValueListenableConsumer<ClientState>(
+                    listener: _listenClientState,
+                    valueListenable: _avatarClientService,
+                    builder: (context, state, child) {
+                      return ValueListenableBuilder<String?>(
+                        valueListenable: _avatarPhotoController,
+                        builder: (context, file, child) {
+                          if (state is PendingClientState) file = null;
+                          return CustomButton(
+                            onPressed: _openAvatarPhotoModal,
+                            child: AuthSignupProfilAvatar(
+                              foregroundImage: file != null ? NetworkImage('${RepositoryService.httpURL}/storage/$file') : null,
+                              child: state is PendingClientState ? const CircularProgressIndicator.adaptive() : null,
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
               ),
@@ -172,11 +246,11 @@ class _AccountScreenState extends State<AccountScreen> {
                     onTap: _openFullNameModal,
                     controller: _fullNameTextController,
                     decoration: InputDecoration(
-                      labelText: 'Nom complet',
                       border: const UnderlineInputBorder(),
+                      labelText: localizations.fullname.capitalize(),
                       suffixIcon: ValueListenableConsumer<ClientState>(
                         listener: _listenClientState,
-                        valueListenable: _clientService,
+                        valueListenable: _fullNameClientService,
                         builder: (context, state, child) {
                           return Visibility(
                             visible: state is! PendingClientState,
@@ -200,8 +274,8 @@ class _AccountScreenState extends State<AccountScreen> {
                     onTap: _openPhoneNumberModal,
                     controller: _phoneTextController,
                     decoration: InputDecoration(
-                      labelText: 'Numréro de téléphone',
                       border: const UnderlineInputBorder(),
+                      labelText: localizations.phonenumber.capitalize(),
                       suffixIcon: ValueListenableConsumer<AuthState>(
                         listener: _listenAuthState,
                         valueListenable: _authService,

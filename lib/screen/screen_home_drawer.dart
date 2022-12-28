@@ -9,6 +9,7 @@ class HomeDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Drawer(
       child: BottomAppBar(
         elevation: 0.0,
@@ -30,7 +31,7 @@ class HomeDrawer extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: CustomListTile(
-                title: const Text('Profil'),
+                title: Text(localizations.profile.capitalize()),
                 leading: const Icon(CupertinoIcons.person),
                 onTap: () => context.pushNamed(AccountScreen.name),
               ),
@@ -46,7 +47,7 @@ class HomeDrawer extends StatelessWidget {
             SliverToBoxAdapter(
               child: CustomListTile(
                 leading: const Icon(CupertinoIcons.cube_box),
-                title: const Text('Commandes'),
+                title: Text('${localizations.order.capitalize()}s'),
                 onTap: () => context.pushNamed(OrderRecordingScreen.name),
               ),
             ),
@@ -54,13 +55,13 @@ class HomeDrawer extends StatelessWidget {
               child: CustomListTile(
                 onTap: () => context.pushNamed(OrderProfitScreen.name),
                 leading: const Icon(CupertinoIcons.tickets),
-                title: const Text('Gains'),
+                title: Text('${localizations.earning.capitalize()}s'),
               ),
             ),
             SliverToBoxAdapter(
               child: CustomListTile(
                 leading: const Icon(CupertinoIcons.info_circle),
-                title: const Text('Aide/Faq'),
+                title: Text(localizations.faq.capitalize()),
                 onTap: () => context.pushNamed(HelpFaqScreen.name),
               ),
             ),
@@ -81,7 +82,7 @@ class HomeDrawer extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
                     onTap: () => context.pushNamed(SettingsScreen.name),
                     leading: const Icon(CupertinoIcons.gear),
-                    title: const Text('Paramètres'),
+                    title: Text(localizations.settings.capitalize()),
                     height: 55.0,
                   ),
                 ],

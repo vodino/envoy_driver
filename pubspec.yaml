@@ -51,6 +51,7 @@ dependencies:
   image_editor:
   image_picker:
   hive_flutter:
+  url_launcher:
   location:
   isar: *isar_version
   hive:
@@ -74,6 +75,7 @@ flutter_gen:
 flutter_icons:
   android: true
   ios: true
+  image_path_android: "assets/images/envoy_driver_circle_logo.png"
   image_path: "assets/images/envoy_driver_logo.png"
 
 flutter_native_splash:

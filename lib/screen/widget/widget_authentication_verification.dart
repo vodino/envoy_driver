@@ -9,9 +9,11 @@ class AuthVerificationAppBar extends DefaultAppBar {
   const AuthVerificationAppBar({super.key});
   @override
   Widget build(BuildContext context) {
-    return const CupertinoNavigationBar(
-      middle: Text('Verification'),
-      border: Border.fromBorderSide(BorderSide.none),
+    final localizations = context.localizations;
+    return CupertinoNavigationBar(
+      middle: Text(localizations.codecheck.capitalize()),
+      border: const Border.fromBorderSide(BorderSide.none),
+      transitionBetweenRoutes: false,
     );
   }
 }
@@ -26,12 +28,13 @@ class AuthVerificationTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Center(
       child: IntrinsicWidth(
         child: CustomListTile(
           title: Text.rich(
             TextSpan(
-              text: 'Entrez le code réçu au numéro de téléphone\n',
+              text: '${localizations.entercodereceivedphonenumber.capitalize()}\n',
               children: [
                 TextSpan(
                   text: phoneNumber,

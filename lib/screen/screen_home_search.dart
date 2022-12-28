@@ -138,6 +138,7 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return WillPopScope(
       onWillPop: _cancel,
       child: ValueListenableListener<ClientState>(
@@ -178,7 +179,7 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
                                   child: Visibility(
                                     visible: onPressed != null,
                                     replacement: const CupertinoActivityIndicator(),
-                                    child: const Text('Se mettre en ligne'),
+                                    child: Text(localizations.getonline.capitalize()),
                                   ),
                                 );
                               },
@@ -193,7 +194,7 @@ class _HomeOnlineScreenState extends State<HomeOnlineScreen> with WidgetsBinding
                                   child: Visibility(
                                     visible: onPressed != null,
                                     replacement: const CupertinoActivityIndicator(),
-                                    child: const Text('Arrêter'),
+                                    child: Text(localizations.stop.capitalize()),
                                   ),
                                 );
                               },

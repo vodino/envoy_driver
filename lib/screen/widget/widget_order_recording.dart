@@ -9,8 +9,9 @@ class OrderRecordingAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoNavigationBar(
-      middle: Text('Commandes'),
+    final localizations = context.localizations;
+    return CupertinoNavigationBar(
+      middle: Text('${localizations.order.capitalize()}s'),
       transitionBetweenRoutes: false,
     );
   }
@@ -159,6 +160,42 @@ class OrderRecordingShimmer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class OrderRecordingItemTile extends StatelessWidget {
+  const OrderRecordingItemTile({
+    super.key,
+    required this.price,
+    required this.title,
+    required this.from,
+    required this.to,
+    this.onTap,
+  });
+  final String? title;
+  final double price;
+  final String from;
+  final String to;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = context.localizations;
+    final cupertinoTheme = context.cupertinoTheme;
+    return CustomListTile(
+      height: 60.0,
+      leading: CustomCircleAvatar(
+        radius: 18.0,
+        elevation: 0.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        child: const Icon(Icons.motorcycle),
+      ),
+      trailing: Text('$price F', style: cupertinoTheme.textTheme.navTitleTextStyle),
+      title: Text((title ?? localizations.order).capitalize(), style: cupertinoTheme.textTheme.textStyle),
+      // subtitle: Text(localizations.fromto(from, to).capitalize()),
+      onTap: onTap,
     );
   }
 }

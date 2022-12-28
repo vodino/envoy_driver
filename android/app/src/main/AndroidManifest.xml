@@ -10,6 +10,13 @@
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission
         android:name="android.permission.VIBRATE"/>
+    <queries>
+        <!-- If your app checks for call support -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="tel" />
+        </intent>
+    </queries>
     <application
         android:label="envoy_driver"
         android:name="${applicationName}"

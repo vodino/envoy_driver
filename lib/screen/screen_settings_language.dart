@@ -38,6 +38,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return Scaffold(
       appBar: const SettingsLanguageAppBar(),
       body: ValueListenableBuilder<Locale?>(
@@ -51,7 +52,7 @@ class _SettingsLanguageScreenState extends State<SettingsLanguageScreen> {
                   _localeService.clear();
                   Navigator.pop(context);
                 },
-                title: const Text('Langage système'),
+                title: Text(localizations.systemlanguage.capitalize()),
               ),
               const Divider(),
               ListView.separated(

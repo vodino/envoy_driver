@@ -20,7 +20,7 @@ class ImageEditorAppBar extends DefaultAppBar {
       transitionBetweenRoutes: false,
       trailing: CustomButton(
         onPressed: onTrailingPressed,
-        child: const Text('Valider'),
+        child: const Icon(CupertinoIcons.check_mark, color: CupertinoColors.activeGreen),
       ),
     );
   }
@@ -40,9 +40,17 @@ class ImageEditorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(onTap: onTap, child: Tab(icon: icon, child: Text(text)));
+    return InkWell(
+      onTap: onTap,
+      child: Tab(
+        icon: IconTheme(data: const IconThemeData(color: CupertinoColors.systemGrey), child: icon),
+        iconMargin: const EdgeInsets.symmetric(vertical: 4.0),
+        child: FittedBox(child: Text(text)),
+      ),
+    );
   }
 }
+
 
 class ImageEditorBottomAppBar extends StatelessWidget {
   const ImageEditorBottomAppBar({
@@ -50,42 +58,51 @@ class ImageEditorBottomAppBar extends StatelessWidget {
     this.onRefresh,
     this.onRotateLeft,
     this.onRotateRight,
-    this.onSwitch,
+    this.onFlip,
   });
 
-  final VoidCallback? onSwitch;
+  final VoidCallback? onFlip;
   final VoidCallback? onRotateLeft;
   final VoidCallback? onRotateRight;
   final VoidCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 45.0,
-      child: BottomAppBar(
-        elevation: 0.0,
-        color: Colors.transparent,
+    final localizations = context.localizations;
+    return BottomAppBar(
+      elevation: 0.0,
+      shape: const AutomaticNotchedShape(Border(top: BorderSide(color: CupertinoColors.systemGrey))),
+      child: SizedBox(
+        height: 50.0,
         child: Row(
           children: [
-            ImageEditorButton(
-              icon: const Icon(CupertinoIcons.arrow_left_right_square_fill),
-              text: 'Inverser',
-              onTap: onSwitch,
+            Expanded(
+              child: ImageEditorButton(
+                icon: const Icon(CupertinoIcons.arrow_left_right_square_fill),
+                text: localizations.flip.capitalize(),
+                onTap: onFlip,
+              ),
             ),
-            ImageEditorButton(
-              icon: const Icon(CupertinoIcons.rotate_left_fill),
-              text: 'Tourner à gauche',
-              onTap: onRotateLeft,
+            Expanded(
+              child: ImageEditorButton(
+                icon: const Icon(CupertinoIcons.rotate_left_fill),
+                text: localizations.rotateleft.capitalize(),
+                onTap: onRotateLeft,
+              ),
             ),
-            ImageEditorButton(
-              icon: const Icon(CupertinoIcons.rotate_right_fill),
-              text: 'Tourner à droit',
-              onTap: onRotateRight,
+            Expanded(
+              child: ImageEditorButton(
+                icon: const Icon(CupertinoIcons.rotate_right_fill),
+                text: localizations.rotateright.capitalize(),
+                onTap: onRotateRight,
+              ),
             ),
-            ImageEditorButton(
-              icon: const Icon(CupertinoIcons.refresh_circled_solid),
-              text: 'Reinitialiser',
-              onTap: onRefresh,
+            Expanded(
+              child: ImageEditorButton(
+                icon: const Icon(CupertinoIcons.refresh_circled_solid),
+                text: localizations.reset.capitalize(),
+                onTap: onRefresh,
+              ),
             ),
           ],
         ),

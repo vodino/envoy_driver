@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:maplibre_gl/mapbox_gl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '_screen.dart';
 
@@ -22,6 +23,28 @@ class HomeOrderDeliveryScreen extends StatefulWidget {
 }
 
 class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
+  /// Customer
+
+  Future<void> _openPhonesModal(List<String> phones) async {
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return HomeOrderPickupPhonesModal(
+          onPhone: (value) => Navigator.pop(context, value),
+          onCancel: () => Navigator.pop(context),
+          phones: phones,
+        );
+      },
+    );
+    if (value != null) {
+      _launchPhone(value);
+    }
+  }
+
+  void _launchPhone(String phone) {
+    launchUrl(Uri(scheme: 'tel', host: phone));
+  }
+
   /// OrderService
   late final OrderService _orderService;
 
@@ -60,9 +83,7 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
   /// ClientService
   late final ClientService _clientService;
 
-  void _listenClientState(BuildContext context, ClientState state) {
-    print(state);
-  }
+  void _listenClientState(BuildContext context, ClientState state) {}
 
   void _updateLocation(LocationData position) {
     _clientService.handle(UpdateClientLocation(
@@ -131,6 +152,7 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return ValueListenableListener<ClientState>(
       listener: _listenClientState,
       valueListenable: _clientService,
@@ -147,9 +169,21 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const HomeOrderDeliveryAppBar(),
-                HomeOrderPickupTile(
-                  color: CupertinoColors.activeOrange,
-                  title: widget.order.deliveryPhoneNumber!.phones!.join(', '),
+                Builder(
+                  builder: (context) {
+                    final phones = widget.order.deliveryPhoneNumber!.phones!;
+                    return HomeOrderPickupTile(
+                      color: CupertinoColors.activeOrange,
+                      title: phones.join(', '),
+                      onTap: () {
+                        if (phones.length == 1) {
+                          _launchPhone(phones.first);
+                        } else {
+                          _openPhonesModal(phones);
+                        }
+                      },
+                    );
+                  }
                 ),
                 CustomLocationTile(
                   title: widget.order.deliveryPlace!.title!,
@@ -203,7 +237,7 @@ class _HomeOrderDeliveryScreenState extends State<HomeOrderDeliveryScreen> {
                       child: Visibility(
                         visible: onPressed != null,
                         replacement: const CupertinoActivityIndicator(),
-                        child: const Text("J'ai livré"),
+                        child: Text(localizations.idelivered.capitalize()),
                       ),
                     );
                   },

@@ -83,6 +83,7 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return ValueListenableListener<LocationState>(
       initiated: true,
       listener: _listenLocationState,
@@ -108,11 +109,11 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
                         duration: _timeout,
                         onDone: _onTimeout,
                         icon: Text(
-                          'Vous avez ',
+                          '${localizations.youare.capitalize()} ',
                           style: context.cupertinoTheme.textTheme.textStyle,
                         ),
                         suffixIcon: Text(
-                          ' secondes',
+                          ' ${localizations.second}s',
                           style: context.cupertinoTheme.textTheme.textStyle,
                         ),
                         slideDirection: SlideDirection.up,
@@ -138,7 +139,7 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
                           Expanded(
                             child: CustomOutlineButton(
                               onPressed: onDeclinePressed,
-                              child: const Text('Refuser'),
+                              child: Text(localizations.refuse.capitalize()),
                             ),
                           ),
                           const SizedBox(width: 8.0),
@@ -149,7 +150,7 @@ class _HomeOrderNewScreenState extends State<HomeOrderNewScreen> {
                               child: Visibility(
                                 visible: onAcceptPressed != null,
                                 replacement: const CupertinoActivityIndicator(),
-                                child: const Text('Accepter'),
+                                child: Text(localizations.accept.capitalize()),
                               ),
                             ),
                           ),

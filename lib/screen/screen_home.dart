@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
@@ -172,11 +173,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onMapCreated(MaplibreMapController controller) async {
     _mapController = controller;
-    await _mapController!.updateContentInsets(EdgeInsets.only(bottom: _height * 0.4));
+    final bottom =  Platform.isIOS ? _height * 0.4 : _height * 0.75;
+    await _mapController!.updateContentInsets(EdgeInsets.only(bottom: bottom));
     _goToMyPosition();
   }
 
-  void _onCameraIdle(PointerMoveEvent event) {
+  void _onPointUp(PointerUpEvent event) {
     _myPositionFocus.value = false;
   }
 
@@ -212,6 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
     required RouteSchema route,
     required Color color,
   }) async {
+    _myPositionFocus.value = false;
+
     /// Draw
     final options = LineOptions(lineColor: color.toHexStringRGB(), lineJoin: 'round', lineWidth: 4.0);
     // _drawIcon(path: Assets.images.mappinBlue.path, position: route.coordinates!.last);
@@ -410,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: AfterLayout(
                 listener: _afterLayout,
                 child: Listener(
-                  onPointerMove: _onCameraIdle,
+                  onPointerUp: _onPointUp,
                   child: HomeMap(
                     onMapCreated: _onMapCreated,
                     onUserLocationUpdated: _onUserLocationUpdated,

@@ -13,5 +13,132 @@
     "notifications": "notifications",
     "language": "language",
     "selectlanguage": "Select a language",
-    "logout": "logout"
+    "logout": "logout",
+
+    "fullname": "fullname",
+    "modifyfullname": "edit the fullname",
+    "phonenumber": "phone number",
+    "modifyprofilephoto": "edit the profile photo",
+    "modifyphonenumber": "edit the phone number",
+    "selectcountry": "select a country",
+    "selectoptionimage": "select an option to get an image",
+    "opencamera": "open camera",
+    "opengallery": "open gallery",
+
+    "cancel": "cancel",
+    "finished": "finished",
+    "fieldcannotbeempty": "this field cannot be empty",
+    "errorhasoccurred": "an error has occurred",
+    "clicktry": "click here to try again",
+
+    "accountinfo": "account information",
+    "enteraccountinfo": "enter account information",
+    "documentcniorpassport": "document (cni or passport)",
+    "rectodocument": "recto document",
+    "versodocument": "back document",
+    "recto": "recto",
+    "verso": "back",
+    "rectocompleted": "recto (completed)",
+    "versocompleted": "back (completed)",
+
+    "authenticatephonenumberbysms": "authenticate your phone number by sms",
+    "codecheck": "code check",
+    "entercodereceivedphonenumber": "enter the code received at the phone number",
+    "resendcode": "resend the code",
+    "inside": "in",
+    "dialcode": "dialcode",
+    "acceptthe": "accept the",
+    "termsofuse": "terms of use",
+    "theuseofpersonalinformation": "and the use of your personal information in accordance with the",
+    "privacypolicies": "privacy policies",
+    "phonenumberrequired": "phone number is required",
+    "dialcoderequired": "dialcode is required",
+    "readandacceptterms": "please read and accept the terms of the contract",
+    
+    "availablity": "availablity",
+
+    "orderdelivery": "order delivery",
+    "idelivered": "i delivered",
+
+    "neworder": "new order",
+    "youare": "you are",
+    "second": "second",
+    "refuse": "refuse",
+    "accept": "accept",
+
+    "orderpickup": "order pickup",
+    "ipickedup": "i picked up",
+    "selectphonenumbercall": "select a phone number to call",
+    "currentorder": "current order",
+
+    "startoforder": "début de commande",
+    "revenue": "revenue",
+    "distance": "distance",
+    "start": "start",
+
+    "youcurrentlyoffline": "you are currently offline",
+    "waitingneworder": "waiting for new order",
+    "getonline": "get online",
+    "stop": "stop",
+    "edit": "edit",
+
+    "flip": "flip",
+    "rotateleft": "rotate left",
+    "rotateright": "rotate right",
+    "reset": "reset",
+
+    "order": "order",
+    "createdate": "created the {date} to {time}", 
+    "@createdate": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "2020/02/02"
+            },
+            "time": {
+                "type": "String",
+                "example": "02:20"
+            }
+        }
+    },
+    "moreinfo": "more info",
+    "deliveryprice": "delivery price",
+    "orderstatus": "order status",
+    "acceptedcourier": "accepted by courier",
+    "beingcollected": "being collected",
+    "beingdelivered": "being delivered",
+    "deliveredcompleted": "delivered and completed",
+    "client": "client",
+    "contactpickup": "contact for pickup",
+    "contactdelivery": "contact for delivery",
+    "purchasecourier": "purchase by courier",
+
+    "fromto": "from {from} to {to}", 
+    "@fromto": {
+        "placeholders": {
+            "from": {
+                "type": "String",
+                "example": "2020/02/02"
+            },
+            "to": {
+                "type": "String",
+                "example": "02:20"
+            }
+        }
+    },
+    "close": "close",
+    "evaluation": "evaluation",
+    "writedowncustomerorder": "write down the customer's order",
+    "type": "type",
+    "submit": "submit",
+    "earning": "earning",
+    "token": "token",
+
+    "activeorder": "active order",
+    "scheduledorder": "scheduled order",
+    "completedorder": "completed order",
+    "noactiveorder": "no active orders",
+    "nocompletedorder": "no completed orders",
+
+    "systemlanguage": "system language"
 }

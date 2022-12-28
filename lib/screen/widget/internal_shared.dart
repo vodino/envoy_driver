@@ -7,6 +7,7 @@ import '_widget.dart';
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
+    this.onTap,
     this.hintText,
     this.labelText,
     this.maxLines = 1,
@@ -41,6 +42,7 @@ class CustomTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final TextAlign textAlign;
   final TextInputType? keyboardType;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,7 @@ class CustomTextField extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       ),
       child: TextFormField(
+        onTap: onTap,
         autofocus: autofocus,
         keyboardType: keyboardType,
         textAlign: textAlign,
@@ -291,8 +294,9 @@ class _CustomTextFieldModalState extends State<CustomTextFieldModal> {
   late final TextEditingController _valueTextController;
 
   String? _validator(String? value) {
+    final localizations = context.localizations;
     if (value == null || value.isEmpty) {
-      return 'Ce champ ne peut être vide';
+      return localizations.fieldcannotbeempty.capitalize();
     }
     return null;
   }
@@ -308,6 +312,7 @@ class _CustomTextFieldModalState extends State<CustomTextFieldModal> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
     return CupertinoAlertDialog(
       title: Text(widget.title),
       content: Padding(
@@ -339,11 +344,11 @@ class _CustomTextFieldModalState extends State<CustomTextFieldModal> {
         CupertinoDialogAction(
           isDestructiveAction: true,
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(localizations.cancel.capitalize()),
         ),
         CupertinoDialogAction(
           isDefaultAction: true,
-          child: const Text('Terminer'),
+          child: Text(localizations.finished.capitalize()),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               Navigator.pop(context, _valueTextController.text);
@@ -407,20 +412,28 @@ class CustomErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(CupertinoIcons.clear_circled, size: 60.0, color: CupertinoColors.destructiveRed),
-          const SizedBox(height: 16.0),
-          Text(
-            "Une erreur s'est produite",
-            style: context.cupertinoTheme.textTheme.navTitleTextStyle,
-          ),
-          const SizedBox(height: 8.0),
-          const Text("Cliquer ici pour réessayer"),
-        ],
+    final localizations = context.localizations;
+    final cupertinoTheme = context.cupertinoTheme;
+    return SizedBox.expand(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(CupertinoIcons.clear_circled, size: 60.0, color: CupertinoColors.destructiveRed),
+            const SizedBox(height: 16.0),
+            Text(
+              localizations.errorhasoccurred.capitalize(),
+              style: cupertinoTheme.textTheme.navTitleTextStyle,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              localizations.clicktry.capitalize(),
+              style: cupertinoTheme.textTheme.textStyle,
+            ),
+          ],
+        ),
       ),
     );
   }

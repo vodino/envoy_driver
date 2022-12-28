@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 import '_service.dart';
@@ -62,12 +63,6 @@ class LoginClient extends ClientEvent {
         case 200:
           final data = await compute(Client.fromServerJson, response.data!);
           await service.handle(PutClient(client: data));
-          break;
-        case 404:
-          service.value = NoClientItemState(
-            phoneNumber: phoneNumber,
-            token: token,
-          );
           break;
         default:
           service.value = FailureClientState(
@@ -155,14 +150,20 @@ class DeleteClient extends ClientEvent {
 
 class RegisterClient extends ClientEvent {
   const RegisterClient({
+    required this.firebaseToken,
     required this.phoneNumber,
     required this.fullName,
-    required this.token,
+    required this.avatar,
+    this.documentRecto,
+    this.documentVerso,
   });
 
+  final Uint8List? documentVerso;
+  final Uint8List? documentRecto;
+  final String firebaseToken;
   final String phoneNumber;
+  final Uint8List avatar;
   final String fullName;
-  final String token;
 
   String get url => '${RepositoryService.httpURL}/v1/api/rider/register';
 
@@ -170,25 +171,27 @@ class RegisterClient extends ClientEvent {
   Future<void> _execute(ClientService service) async {
     service.value = const PendingClientState();
     try {
-      final body = {'phone_number': phoneNumber, 'firebase_token': token, 'full_name': fullName};
+      final data = FormData.fromMap({
+        'file_verso': documentVerso != null ? MultipartFile.fromBytes(documentVerso!, filename: 'file_verso.png') : null,
+        'file_recto': documentRecto != null ? MultipartFile.fromBytes(documentRecto!, filename: 'file_recto.png') : null,
+        'notification_token': await FirebaseMessaging.instance.getToken(),
+        'avatar': MultipartFile.fromBytes(avatar, filename: 'avatar.png'),
+        'firebase_token': firebaseToken,
+        'phone_number': phoneNumber,
+        'full_name': fullName,
+      }..removeWhere((key, value) => value == null));
       final response = await Dio().postUri<String>(
         Uri.parse(url),
-        data: jsonEncode(body),
+        data: data,
         options: Options(headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
         }),
       );
       switch (response.statusCode) {
         case 200:
           final data = await compute(Client.fromServerJson, response.data!);
           await service.handle(PutClient(client: data));
-          break;
-        case 404:
-          service.value = NoClientItemState(
-            phoneNumber: phoneNumber,
-            token: token,
-          );
           break;
         default:
           service.value = FailureClientState(
@@ -207,11 +210,17 @@ class RegisterClient extends ClientEvent {
 
 class UpdateClient extends ClientEvent {
   const UpdateClient({
+    this.documentRecto,
+    this.documentVerso,
     this.phoneNumber,
     this.fullName,
+    this.avatar,
   });
 
+  final Uint8List? documentVerso;
+  final Uint8List? documentRecto;
   final String? phoneNumber;
+  final Uint8List? avatar;
   final String? fullName;
 
   String get _url => '${RepositoryService.httpURL}/v1/api/rider/update';
@@ -222,17 +231,20 @@ class UpdateClient extends ClientEvent {
     try {
       final client = ClientService.authenticated!;
       final token = client.accessToken;
-      final body = {
-        'full_name': fullName,
+      final data = FormData.fromMap({
+        'document_verso': documentVerso != null ? MultipartFile.fromBytes(documentVerso!, filename: 'file_verso.png') : null,
+        'document_recto': documentRecto != null ? MultipartFile.fromBytes(documentRecto!, filename: 'file_recto.png') : null,
+        'avatar': avatar != null ? MultipartFile.fromBytes(avatar!, filename: 'avatar.png') : null,
         'phone_number': phoneNumber,
-      }..removeWhere((key, value) => value == null);
+        'full_name': fullName,
+      }..removeWhere((key, value) => value == null));
       final response = await Dio().postUri<String>(
         Uri.parse(_url),
-        data: jsonEncode(body),
+        data: data,
         options: Options(headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         }),
       );
       switch (response.statusCode) {
@@ -346,13 +358,8 @@ class UpdateClientLocation extends ClientEvent {
       );
       switch (response.statusCode) {
         case 200:
-          print(response.data);
           break;
         default:
-          service.value = FailureClientState(
-            message: response.data!,
-            event: this,
-          );
       }
     } catch (error) {
       service.value = FailureClientState(

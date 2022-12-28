@@ -9,8 +9,9 @@ class OrderProfitAppBar extends DefaultAppBar {
 
   @override
   Widget build(BuildContext context) {
-    return const CupertinoNavigationBar(
-      middle: Text('Gains'),
+    final localizations = context.localizations;
+    return CupertinoNavigationBar(
+      middle: Text('${localizations.earning.capitalize()}s'),
       transitionBetweenRoutes: false,
     );
   }
